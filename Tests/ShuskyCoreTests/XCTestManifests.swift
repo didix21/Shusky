@@ -6,7 +6,9 @@ extension ShuskyCoreTests {
     //   `swift test --generate-linuxmain`
     // to regenerate.
     static let __allTests__ShuskyCoreTests = [
-        ("testShuskyFileHandler", testShuskyFileHandler),
+        ("testReadShuskyYml", testReadShuskyYml),
+        ("testShuskyFileName", testShuskyFileName),
+        ("testShuskyFilePath", testShuskyFilePath),
     ]
 }
 
