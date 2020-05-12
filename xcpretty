@@ -1,0 +1,8 @@
+[1/5] Merging module Logging
+[2/5] Merging module Files
+[3/5] Merging module Yams
+[4/6] Merging module ShuskyCore
+[5/8] Merging module Shusky
+[6/8] Merging module ShuskyCoreTests
+[7/8] Merging module ShuskyTests
+Optional([AnyHashable("precommit"): ["bubi", "lala", "swift run", [AnyHashable("run"): [AnyHashable("critical"): true, AnyHashable("command"): "swift run swiftformat", AnyHashable("path"): "./here/path"]]]])
