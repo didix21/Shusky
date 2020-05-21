@@ -91,11 +91,6 @@ final class ShuskyModelsTests: XCTestCase {
         XCTAssertEqual(actualCommand, command)
     }
 
-    func testInvalidDictInHook() throws {
-        let config = genHookConfig([])
-        assert(try Hook.parse(hookType: .preCommit, config), throws: ShuskyParserError.isNotDict)
-    }
-
     func testEmptyYaml() throws {
         let config = genHookConfig([])
         assert(try ShuskyParser(hookType: .preCommit, yamlContent: config), throws: ShuskyParserError.shuskyConfigIsEmpty)
@@ -114,7 +109,6 @@ final class ShuskyModelsTests: XCTestCase {
         )
     }
 
-
     func testParseSimpleConfig() throws {
         let config = genHookConfig([.verbose(verbose), .hookType(.preCommit), .commands([echo])])
         let expectedHook = Hook(
@@ -125,39 +119,60 @@ final class ShuskyModelsTests: XCTestCase {
     }
 
     func testParseComplexConfig() throws {
-        let swiftformat = "swift run -C release swiftformat ."
-        let swiftlint = "swift run -C lint swiftlint ."
+        let swiftFormat = "swift run -c release swiftformat ."
+        let swiftLint = "swift run -c lint swiftlint ."
         let config = """
                      verbose: \(verbose)
                      pre-commit: 
                         - \(echo)
-                        - \(swiftlint)
+                        - \(swiftLint)
                         - run:
-                            command: \(swiftformat)
+                            command: \(swiftFormat)
                         - run:
-                            command: \(swiftlint)
+                            command: \(swiftLint)
                             path: \(path)
                         - run:
-                            command: \(swiftformat)
+                            command: \(swiftFormat)
                             path: \(path)
                             critical: \(critical)
                         - run:
-                            command: \(swiftlint)
+                            command: \(swiftLint)
                             path: \(path)
                             critical: \(critical)
                             verbose: \(verbose)
                      """
         let commands = [
             Command(run: Run(command: echo)),
-            Command(run: Run(command: swiftlint)),
-            Command(run: Run(command: swiftformat)),
-            Command(run: Run(command: swiftlint, path: path)),
-            Command(run: Run(command: swiftformat, path: path, critical: critical)),
-            Command(run: Run(command: swiftlint, path: path, critical: critical, verbose: verbose))
+            Command(run: Run(command: swiftLint)),
+            Command(run: Run(command: swiftFormat)),
+            Command(run: Run(command: swiftLint, path: path)),
+            Command(run: Run(command: swiftFormat, path: path, critical: critical)),
+            Command(run: Run(command: swiftLint, path: path, critical: critical, verbose: verbose))
         ]
         let expectedHook = Hook(hookType: .preCommit, verbose: true, commands: commands)
         let shuskyParsed = try ShuskyParser(hookType: .preCommit, yamlContent: config)
         XCTAssertEqual(shuskyParsed.hook, expectedHook)
+    }
+
+    func testHooksParser() throws {
+        let config = """
+                     applypatch-msg:
+                        - echo Hello world
+                     post-applypatch:
+                        - echo Hello world
+                     pre-commit:
+                        - run:
+                            command: echo Hello World
+                            critical: true
+                     post-merge:
+                        - echo Hello world
+                     pre-push:
+                        - echo Hello world
+                     """
+        let expectedHookTypes: [HookType] = [.applypatchMsg, .postApplyPatch, .preCommit, .postMerge, .prePush]
+
+        let hooksParser = try HooksParser(config)
+        XCTAssertEqual(hooksParser.availableHooks, expectedHookTypes)
     }
 
     func testHookTypeEnum() {

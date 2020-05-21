@@ -18,7 +18,7 @@ final class ShuskyFileTests: XCTestCase {
                 withName: "ShuskyConfigFilesPath"
         )
         // Empty the test folder to ensure a clean state
-        try! testFolder.empty()
+        try! testFolder.empty(includingHidden: true)
 
         // Make the temp folder the current working folder
         let fileManager = FileManager.default
@@ -26,7 +26,7 @@ final class ShuskyFileTests: XCTestCase {
     }
 
     override func tearDown() {
-        try! testFolder.empty()
+        try! testFolder.empty(includingHidden: true)
     }
 
     func testShuskyFileName() throws {
@@ -54,6 +54,15 @@ final class ShuskyFileTests: XCTestCase {
         try shuskyFile.createDefaultShuskyYaml()
         let file = try File(path: "./\(self.fileName)")
         XCTAssertEqual(shuskyFile.defaultConfig, try! file.readAsString())
+    }
+
+    func testDontCreateDefaultShuskyYamlFileIfNotEmpty() throws  {
+        let folder = try Folder(path: "./")
+        let file = try folder.createFile(at: fileName)
+        try file.write("Some data there")
+        try shuskyFile.createDefaultShuskyYaml()
+
+        XCTAssertEqual(try file.readAsString(), "Some data there")
     }
 
     /// Returns path to the built products directory.
