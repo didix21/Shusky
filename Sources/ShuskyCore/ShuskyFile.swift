@@ -1,8 +1,11 @@
+
+import Foundation
 import Files
+
 
 public protocol Nameable {
     var fileName: String { get }
-    var path: String { get }
+    var path: String { get set }
 }
 
 
@@ -42,19 +45,33 @@ extension  Writable {
 
 class ShuskyFile: Readable, Writable {
     public let fileName = ".shusky.yml"
-    public let path = "./"
+    public var path = "./"
 
     public var defaultConfig: String {
         """
         pre-commit:
             - echo "Shusky is ready, please configure \(self.fileName)
+
         """
+    }
+
+    public init(path: String? = nil) {
+        if let path = path {
+            self.path = path
+        }
     }
 
     public func createDefaultShuskyYaml() throws {
         try create()
-        try write(defaultConfig)
+        guard let content = try? read() else {
+            try write(defaultConfig)
+            return
+        }
+        if content.isEmpty {
+            try write(defaultConfig)
+        }
     }
+
 }
 
 

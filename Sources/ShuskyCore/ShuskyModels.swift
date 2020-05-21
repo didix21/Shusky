@@ -9,6 +9,19 @@ public protocol Parseable {
     static func parse(_ data: Any) throws -> Self
 }
 
+protocol Yamable {
+    func load(_ yaml: String) throws -> [String: Any]
+}
+
+extension Yamable {
+    func load(_ yaml: String) throws -> [String: Any] {
+        let content = try Yams.load(yaml: yaml)
+        guard let yaml = content else { throw ShuskyParserError.shuskyConfigIsEmpty }
+        guard let data = yaml as? [String: Any] else { throw ShuskyParserError.isNotDict }
+        return data
+    }
+}
+
 public enum ShuskyParserError: Error, Equatable {
     case shuskyConfigIsEmpty
     case isNotDict
@@ -34,9 +47,15 @@ public enum HookType: String {
     case postCheckout = "post-checkout"
     case postMerge = "post-merge"
     case prePush = "pre-push"
+
+    static func getAll() -> [HookType] {
+        [.applypatchMsg, preApplyPatch, .postApplyPatch, .preCommit,
+         .preMergeCommit, .prepareCommitMsg, .commitMsg, .postCommit,
+         .preRebase, .postCheckout, .postMerge, .prePush]
+    }
 }
 
-class ShuskyParser {
+class ShuskyParser: Yamable {
     let hookType: HookType
     let yamlContent: String
     private(set) var hook: Hook?
@@ -48,26 +67,33 @@ class ShuskyParser {
     }
 
     private func parse() throws -> Hook {
-        let data = try Yams.load(yaml: yamlContent)
-        guard let yaml = data else { throw ShuskyParserError.shuskyConfigIsEmpty }
-
-        return try Hook.parse(hookType: hookType, yaml)
+        let data = try self.load(yamlContent)
+        return try Hook.parse(hookType: hookType, data)
     }
 
-    private func parse(hook: [Any]) throws -> [Command]? {
-        var commands: [Command] = []
+}
 
-        for command in hook  {
-            commands.append(try Command.parse(command))
-        }
+class HooksParser: Yamable {
+    private(set) var availableHooks: [HookType] = []
+    private var yaml: String
 
-        guard !commands.isEmpty else {
-            return nil
-        }
-
-        return commands
+    init(_ yaml: String) throws {
+        self.yaml = yaml
+        try parse()
     }
 
+    private func parse() throws {
+        let data = try self.load(yaml)
+
+        for hookType in HookType.getAll() {
+            guard ((data[hookType.rawValue] as? [Any]) != nil) else { continue }
+            availableHooks.append(hookType)
+        }
+
+        guard !availableHooks.isEmpty else {
+            throw ShuskyParserError.noHookFound
+        }
+    }
 }
 
 public struct Hook: Equatable {
@@ -75,10 +101,7 @@ public struct Hook: Equatable {
     public var verbose: Bool
     public var commands: [Command]
 
-    public static func parse(hookType: HookType, _ data: Any) throws -> Hook {
-        guard let data = data as? [String: Any] else {
-            throw ShuskyParserError.isNotDict
-        }
+    public static func parse(hookType: HookType, _ data: [String: Any]) throws -> Hook {
 
         guard let hook = data[hookType.rawValue] as? [Any] else {
             throw ShuskyParserError.noHookFound
