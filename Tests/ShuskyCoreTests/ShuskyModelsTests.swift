@@ -30,49 +30,111 @@ final class ShuskyModelsTests: XCTestCase {
         RunConfigTests.mapToStr(config)
     }
 
+    func testRunInvalidCommand() throws {
+        let config = """
+                     bubu jfklsd
+                     """
+        guard let yml = try Yams.load(yaml: config) else { return XCTFail("Can not parse yaml file") }
+        assert(try Run.parse(yml), throws: Run.RunError.invalidData("bubu jfklsd"))
+    }
+
+    func testRunInvalidDataInCommand() throws {
+        let config = """
+                     command: true
+                     """
+        guard let yml = try Yams.load(yaml: config) else { return XCTFail("Can not parse yaml file") }
+        assert(try Run.parse(yml), throws: Run.RunError.invalidTypeInRunKey(.command, "true"))
+    }
+
+    func testRunCommand() throws {
+        let config = """
+                     command: swift run shusky install
+                     """
+        guard let yml = try Yams.load(yaml: config) else { return XCTFail("Can not parse yaml file") }
+        let run = try Run.parse(yml)
+        XCTAssertEqual(run, Run(command: "swift run shusky install"))
+    }
+
+    func testRunInvalidDataInPath() throws {
+        let config = """
+                     command: swift run shusky install
+                     path: true
+                     """
+        guard let yml = try Yams.load(yaml: config) else { return XCTFail("Can not parse yaml file") }
+        assert(try Run.parse(yml), throws: Run.RunError.invalidTypeInRunKey(.path, "true"))
+    }
+
+    func testRunPath() throws {
+        let config = """
+                     command: swift run shusky install
+                     path: ./my/path
+                     """
+        guard let yml = try Yams.load(yaml: config) else { return XCTFail("Can not parse yaml file") }
+        let run = try Run.parse(yml)
+        XCTAssertEqual(run, Run(command: "swift run shusky install", path: "./my/path"))
+    }
+
+    func testRunInvalidDataInCritical() throws {
+        let config = """
+                     command: swift run shusky install
+                     critical: Invalid data
+                     """
+        guard let yml = try Yams.load(yaml: config) else { return XCTFail("Can not parse yaml file") }
+        assert(try Run.parse(yml), throws: Run.RunError.invalidTypeInRunKey(.critical, "Invalid data"))
+    }
+
+    func testRunCritical() throws {
+        let config = """
+                     command: swift run shusky install
+                     critical: false
+                     """
+        guard let yml = try Yams.load(yaml: config) else { return XCTFail("Can not parse yaml file") }
+        let run = try Run.parse(yml)
+        XCTAssertEqual(run, Run(command: "swift run shusky install", critical: false))
+    }
+
+    func testRunInvalidDataInVerbose() throws {
+        let config = """
+                     command: swift run shusky install
+                     verbose: Invalid data
+                     """
+        guard let yml = try Yams.load(yaml: config) else { return XCTFail("Can not parse yaml file") }
+        assert(try Run.parse(yml), throws: Run.RunError.invalidTypeInRunKey(.verbose, "Invalid data"))
+    }
+
+    func testRunVerbose() throws {
+        let config = """
+                     command: swift run shusky install
+                     verbose: true
+                     """
+        guard let yml = try Yams.load(yaml: config) else { return XCTFail("Can not parse yaml file") }
+        let run = try Run.parse(yml)
+        XCTAssertEqual(run, Run(command: "swift run shusky install", verbose: true))
+    }
+
     func testInvalidCommand() throws {
         let config = """
                      - This is an invalid command
                      - Another invalid command
                      """
-        assert(try Command.parse(getYamlContent(config)), throws: ShuskyParserError.invalidDataInHook)
-    }
-
-    func testRunWithNoCommandDefined() throws {
-        let config = genRunConfig([])
-       assert(try Command.parse(getYamlContent(config)), throws: ShuskyParserError.noCommands)
+        assert(
+                try Command.parse(getYamlContent(config)),
+                throws: Command.CommandError.invalidData("[\"This is an invalid command\", \"Another invalid command\"]")
+        )
     }
 
     func testRunWithInvalidTypeCommand() throws {
         let config = genRunConfig([.command(true)])
-        assert(try Command.parse(getYamlContent(config)), throws: ShuskyParserError.invalidTypeInRunKey(.command))
-    }
-
-    func testRunWithInvalidTypePath() throws {
-        let config = genRunConfig([.path(true)])
-        assert(try Command.parse(getYamlContent(config)), throws: ShuskyParserError.invalidTypeInRunKey(.path))
-    }
-
-    func testRunWithInvalidTypeCritical() throws {
-        let config = genRunConfig([.critical("bad type")])
-        assert(try Command.parse(getYamlContent(config)), throws: ShuskyParserError.invalidTypeInRunKey(.critical))
-    }
-
-    func testRunWithInvalidTypeVerbose() throws {
-        let config = genRunConfig([.verbose("bad type")])
-        assert(try Command.parse(getYamlContent(config)), throws: ShuskyParserError.invalidTypeInRunKey(.verbose))
+        do {
+            _ = try Command.parse(getYamlContent(config))
+        } catch {
+            XCTAssertNotNil(error as? Command.CommandError)
+        }
     }
 
     func testRunWithCommandDefined() throws {
         let config = genRunConfig([.command(echo)])
         let command = Command(run: Run(command: echo))
-        let actualCommand = try Command.parse(getYamlContent(config))
-        XCTAssertEqual(actualCommand, command)
-    }
-
-    func testRunWithCommandPathDefined() throws {
-        let config = genRunConfig([.command(echo), .path(path)])
-        let command = Command(run: Run(command: echo, path: path))
         let actualCommand = try Command.parse(getYamlContent(config))
         XCTAssertEqual(actualCommand, command)
     }
@@ -91,106 +153,115 @@ final class ShuskyModelsTests: XCTestCase {
         XCTAssertEqual(actualCommand, command)
     }
 
-    func testEmptyYaml() throws {
-        let config = genHookConfig([])
-        assert(try ShuskyParser(hookType: .preCommit, yamlContent: config), throws: ShuskyParserError.shuskyConfigIsEmpty)
-    }
-
-    func testNoHookFound() throws {
-        let config = genHookConfig([.hookType(.preCommit)])
-        assert(try ShuskyParser(hookType: .preCommit, yamlContent: config), throws: ShuskyParserError.noHookFound)
-    }
-
-    func testInvalidTypeVerboseInHook() throws {
-        let config = genHookConfig([.verbose("bad type"), .hookType(.preCommit), .commands([echo])])
-        assert(
-                try ShuskyParser(hookType: .preCommit, yamlContent: config),
-                throws: ShuskyParserError.invalidTypeInHookKey(.verbose)
-        )
-    }
-
-    func testParseSimpleConfig() throws {
-        let config = genHookConfig([.verbose(verbose), .hookType(.preCommit), .commands([echo])])
-        let expectedHook = Hook(
-                hookType: .preCommit, verbose: true, commands: [Command(run: Run(command: echo))]
-        )
-        let shuskyParsed = try ShuskyParser(hookType: .preCommit, yamlContent: config)
-        XCTAssertEqual(shuskyParsed.hook, expectedHook)
-    }
-
-    func testParseComplexConfig() throws {
-        let swiftFormat = "swift run -c release swiftformat ."
-        let swiftLint = "swift run -c lint swiftlint ."
+    func testInvalidCommandInHook() throws {
         let config = """
-                     verbose: \(verbose)
-                     pre-commit: 
-                        - \(echo)
-                        - \(swiftLint)
+                     pre-commit:
+                        - echo print this command
                         - run:
-                            command: \(swiftFormat)
-                        - run:
-                            command: \(swiftLint)
-                            path: \(path)
-                        - run:
-                            command: \(swiftFormat)
-                            path: \(path)
-                            critical: \(critical)
-                        - run:
-                            command: \(swiftLint)
-                            path: \(path)
-                            critical: \(critical)
-                            verbose: \(verbose)
+                            command: true
                      """
-        let commands = [
-            Command(run: Run(command: echo)),
-            Command(run: Run(command: swiftLint)),
-            Command(run: Run(command: swiftFormat)),
-            Command(run: Run(command: swiftLint, path: path)),
-            Command(run: Run(command: swiftFormat, path: path, critical: critical)),
-            Command(run: Run(command: swiftLint, path: path, critical: critical, verbose: verbose))
-        ]
-        let expectedHook = Hook(hookType: .preCommit, verbose: true, commands: commands)
-        let shuskyParsed = try ShuskyParser(hookType: .preCommit, yamlContent: config)
-        XCTAssertEqual(shuskyParsed.hook, expectedHook)
+        let yml = try Yams.load(yaml: config)
+        guard let data = yml as? [String: Any] else { return XCTFail(" Is not a dict ") }
+        assert(
+                try Hook.parse(hookType: .preCommit, data),
+                throws: Hook.HookError.invalidCommand(
+                        .preCommit,
+                        .invalidRun(
+                                .run,
+                               .invalidTypeInRunKey(.command, "true")
+                        )))
     }
 
-    func testHooksParser() throws {
+    func testHookNotFound() throws {
         let config = """
-                     applypatch-msg:
-                        - echo Hello world
-                     post-applypatch:
-                        - echo Hello world
+                     pre-commit:
+                        - echo print this command
+                     """
+        let yml = try Yams.load(yaml: config)
+        guard let data = yml as? [String: Any] else { return XCTFail(" Is not a dict ") }
+        assert(try Hook.parse(hookType: .prePush, data), throws: Hook.HookError.noHookFound)
+    }
+
+    func testHookIsEmpty() throws {
+        let config = """
+                     pre-push:
+                     pre-commit:
+                        - echo print this command
+                     """
+        let yml = try Yams.load(yaml: config)
+        guard let data = yml as? [String: Any] else { return XCTFail(" Is not a dict ") }
+        assert(try Hook.parse(hookType: .prePush, data), throws: Hook.HookError.hookIsEmpty(.prePush))
+    }
+
+    func testInvalidRunInHook() throws {
+        let config = """
+                     pre-push:
+                        - run:
+                     """
+        let yml = try Yams.load(yaml: config)
+        guard let data = yml as? [String: Any] else { return XCTFail(" Is not a dict ") }
+        assert(
+                try Hook.parse(hookType: .prePush, data),
+                throws: Hook.HookError.invalidCommand(
+                        .prePush,
+                        .invalidRun(.run, .invalidData("<null>"))
+                )
+        )
+    }
+
+    func testInvalidTypeInHookVerboseKey() throws {
+        let config = """
+                     verbose: Invalid type
+                     pre-commit:
+                        - echo print this command
+                     """
+        let yml = try Yams.load(yaml: config)
+        guard let data = yml as? [String: Any] else { return XCTFail(" Is not a dict ") }
+        assert(try Hook.parse(hookType: .preCommit, data), throws: Hook.HookError.invalidTypeInHookKey(.verbose, "Invalid type"))
+    }
+
+    func testIfVerboseIsNotDefinedIsSetTrueByDefault() throws {
+        let config = """
                      pre-commit:
                         - run:
-                            command: echo Hello World
-                            critical: true
-                     post-merge:
-                        - echo Hello world
-                     pre-push:
-                        - echo Hello world
+                            command: echo run example
+                            verbose: true
+                        - echo print this please
                      """
-        let expectedHookTypes: [HookType] = [.applypatchMsg, .postApplyPatch, .preCommit, .postMerge, .prePush]
-
-        let hooksParser = try HooksParser(config)
-        XCTAssertEqual(hooksParser.availableHooks, expectedHookTypes)
+        let expectedHook = Hook(
+                hookType: .preCommit,
+                verbose: true,
+                commands: [
+                    Command(run: Run(command: "echo run example", verbose: true)),
+                    Command(run: Run(command: "echo print this please"))
+                ]
+        )
+        let yml = try Yams.load(yaml: config)
+        guard let data = yml as? [String: Any] else { return XCTFail(" Is not a dict ") }
+        XCTAssertEqual(try Hook.parse(hookType: .preCommit, data), expectedHook)
     }
 
-    func testHookTypeEnum() {
-        XCTAssertEqual(HookType.applypatchMsg.rawValue, "applypatch-msg")
-        XCTAssertEqual(HookType.preApplyPatch.rawValue, "pre-applypatch")
-        XCTAssertEqual(HookType.postApplyPatch.rawValue, "post-applypatch")
-        XCTAssertEqual(HookType.preCommit.rawValue, "pre-commit")
-        XCTAssertEqual(HookType.preMergeCommit.rawValue, "pre-merge-commit")
-        XCTAssertEqual(HookType.prepareCommitMsg.rawValue, "prepare-commit-msg")
-        XCTAssertEqual(HookType.commitMsg.rawValue, "commit-msg")
-        XCTAssertEqual(HookType.postCommit.rawValue, "post-commit")
-        XCTAssertEqual(HookType.preRebase.rawValue, "pre-rebase")
-        XCTAssertEqual(HookType.postCheckout.rawValue, "post-checkout")
-        XCTAssertEqual(HookType.postMerge.rawValue, "post-merge")
-        XCTAssertEqual(HookType.prePush.rawValue, "pre-push")
+    func testValidHook() throws {
+        let config = """
+                     verbose: false
+                     pre-commit:
+                        - run:
+                            command: echo run example
+                            verbose: true
+                        - echo print this please
+                     """
+        let expectedHook = Hook(
+                hookType: .preCommit,
+                verbose: false,
+                commands: [
+                    Command(run: Run(command: "echo run example", verbose: true)),
+                    Command(run: Run(command: "echo print this please"))
+                ]
+        )
+        let yml = try Yams.load(yaml: config)
+        guard let data = yml as? [String: Any] else { return XCTFail(" Is not a dict ") }
+        XCTAssertEqual(try Hook.parse(hookType: .preCommit, data), expectedHook)
     }
-
-
 
     /// Returns path to the built products directory.
     var productsDirectory: URL {
