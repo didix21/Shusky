@@ -84,6 +84,28 @@ final class HookHandlerTests: XCTestCase {
         XCTAssertEqual(actualContent, expectedContent)
     }
 
+    func testDontAppendHookIfAlreadyExist() throws {
+        let folder = try Folder(path: path)
+        let file = try folder.createFileIfNeeded(at: HookType.preCommit.rawValue)
+        let expectedContent = "swift run -c release shusky run pre-commit"
+        try file.write(expectedContent)
+
+        _ = try HookHandler(hook: .preCommit, path: path)
+        let actualContent = try file.readAsString()
+        XCTAssertEqual(actualContent, expectedContent)
+    }
+
+    func testDontAppendHookWithPackagePathIfAlreadyExist() throws {
+        let folder = try Folder(path: path)
+        let file = try folder.createFileIfNeeded(at: HookType.preCommit.rawValue)
+        let expectedContent = "swift run -c release --package-path BuildTools shusky run pre-commit"
+        try file.write(expectedContent)
+
+        _ = try HookHandler(hook: .preCommit, path: path, packagePath: "BuildTools")
+        let actualContent = try file.readAsString()
+        XCTAssertEqual(actualContent, expectedContent)
+    }
+
     func testExecutionPermissions() throws {
         _ = try HookHandler(hook: .preCommit, path: path, packagePath: "BuildTools")
         let fm = FileManager.default
