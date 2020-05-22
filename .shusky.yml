@@ -1,0 +1,2 @@
+pre-commit:
+    - echo "Shusky is ready, please configure .shusky.yml
