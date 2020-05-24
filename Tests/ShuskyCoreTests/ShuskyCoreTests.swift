@@ -73,4 +73,70 @@ final class ShuskyCoreTests: XCTestCase {
         XCTAssertEqual(try preCommit.readAsString(), swiftRun(hookType: "pre-commit"))
     }
 
+    func testRunReturn1IfShuskyFileDoesNotExist() throws {
+        let shuskyCore = ShuskyCore()
+        let exitCode = shuskyCore.run(hookType: .preCommit, shuskyPath: "./BuildTools")
+
+        XCTAssertEqual(exitCode, 1)
+    }
+
+    func testRunReturn1IfHookIsEmpty() throws {
+        let config = """
+                     pre-commit:
+                     """
+        let file = try testFolder.createFile(named: shuskyFileName)
+        try file.write(config)
+        let shuskyCore = ShuskyCore()
+        let exitCode = shuskyCore.run(hookType: .preCommit)
+
+        XCTAssertEqual(exitCode, 1)
+    }
+
+    func testRunReturns0IfHookIsNotDefined() throws {
+        let config = """
+                     applypatch-msg:
+                        - echo print something
+                     pre-push:
+                        - echo print something
+                     """
+        let file = try testFolder.createFile(named: shuskyFileName)
+        try file.write(config)
+        let shuskyCore = ShuskyCore()
+        let exitCode = shuskyCore.run(hookType: .preCommit)
+
+        XCTAssertEqual(exitCode, 0)
+    }
+
+    func testRunReturnTheCodeErrorOfCommandThatHasFailed() throws {
+        let config = """
+                     applypatch-msg:
+                        - echo print something
+                     pre-push:
+                        - exit 19
+                     """
+        let file = try testFolder.createFile(named: shuskyFileName)
+        try file.write(config)
+        let shuskyCore = ShuskyCore()
+        let exitCode = shuskyCore.run(hookType: .prePush)
+
+        XCTAssertEqual(exitCode, 19)
+    }
+
+    func testRunReturn0IfAllCommandsAreExecuted() throws {
+        let config = """
+                     applypatch-msg:
+                        - echo print something
+                     pre-push:
+                        - echo command 1
+                        - echo command 2
+                        - echo command 3
+                     """
+        let file = try testFolder.createFile(named: shuskyFileName)
+        try file.write(config)
+        let shuskyCore = ShuskyCore()
+        let exitCode = shuskyCore.run(hookType: .prePush)
+
+        XCTAssertEqual(exitCode, 0)
+    }
+
 }

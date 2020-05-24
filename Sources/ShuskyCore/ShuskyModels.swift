@@ -91,9 +91,9 @@ public struct Hook: Equatable {
             case .noHookFound:
                 return "no hook found"
             case .hookIsEmpty(let hook):
-                return "hook: \(hook.rawValue) is empty!"
+                return "hook: \(hook.rawValue) is empty"
             case .invalidTypeInHookKey(let key, let content):
-                return "invalid type in \(key.rawValue): \(content)!"
+                return "invalid type in \(key.rawValue): \(content)"
             case .invalidCommand(let hook, let error):
                 return "invalid command in \(hook.rawValue): \(error.description())"
             }
