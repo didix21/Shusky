@@ -12,19 +12,19 @@ final class ShuskyTests: XCTestCase {
             return
         }
 
-        let fooBinary = productsDirectory.appendingPathComponent("Shusky")
-
-        let process = Process()
-        process.executableURL = fooBinary
-
-        let pipe = Pipe()
-        process.standardOutput = pipe
-
-        try process.run()
-        process.waitUntilExit()
-
-        let data = pipe.fileHandleForReading.readDataToEndOfFile()
-        let output = String(data: data, encoding: .utf8)
+//        let fooBinary = productsDirectory.appendingPathComponent("Shusky")
+//
+//        let process = Process()
+//        process.executableURL = fooBinary
+//
+//        let pipe = Pipe()
+//        process.standardOutput = pipe
+//
+//        try process.run()
+//        process.waitUntilExit()
+//
+//        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+//        let output = String(data: data, encoding: .utf8)
 
       //  XCTAssertEqual(output, "Hello, world!\n")
     }

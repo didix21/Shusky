@@ -34,7 +34,7 @@ public enum ShuskyParserError: Error, Equatable, Describable {
         case .noHooksFound:
             return "☣️ There isn't any hook in \(shusky)!"
         case .invalidHook(let error):
-            return "☣️ In \(shusky) there is an invalid hook \(error.description())!"
+            return "☣️ In \(shusky) there is an invalid \(error.description())!"
         }
     }
 }

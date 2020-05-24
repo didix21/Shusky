@@ -7,7 +7,7 @@ import XCTest
 import Yams
 @testable import ShuskyCore
 
-final class SHuskyParserTests: XCTestCase {
+final class ShuskyParserTests: XCTestCase {
 
     let preCommit = "pre-commit:"
     let echo = "echo \"print with bash\""

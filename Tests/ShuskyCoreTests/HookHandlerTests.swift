@@ -1,128 +1,148 @@
 //
-// Created by Dídac Coll Pujals on 16/05/2020.
+// Created by Dídac Coll Pujals on 24/05/2020.
 //
 
 import Foundation
-import Files
 import XCTest
 @testable import ShuskyCore
 
+
 final class HookHandlerTests: XCTestCase {
+    let echo = "echo \"Shusky is ready, please configure .shusky.yml\""
 
-    let tmpFolder = Folder.temporary
-    var testFolder: Folder!
-    var shuskyFile: ShuskyFile!
-    let gitPath = "GitPathTests"
-    let path = ".git/hooks/"
+    func testCommandHandler() {
+        let consoleResult = """
+                            \(ANSIColors.white.rawValue)⏳ Running \(echo)
+                            Shusky is ready, please configure .shusky.yml
+                            \(ANSIColors.green.rawValue)✔ \(echo) has successfully executed\n\n
+                            """
+        let hook = Hook(
+                hookType: .preCommit,
+                verbose: true,
+                commands: [Command(run: Run(command: echo))])
+        let printerMock = PrinterMock()
+        let commandHandler = HookHandler(hook: hook, shell: ShellMock(commandOutput: "Shusky is ready, please configure .shusky.yml", statusCode: 0), printer: printerMock)
 
-    override func setUp() {
-        shuskyFile = ShuskyFile()
-        // Setup a temp test folder that can be used as a sandbox
-        testFolder = try! tmpFolder.createSubfolderIfNeeded(
-                withName: gitPath
+        XCTAssertEqual(commandHandler.run(), 0)
+        XCTAssertEqual(printerMock.output, consoleResult)
+    }
+
+    func testCommandHandlerGlobalVerboseFalse() {
+        let consoleResult = """
+                            \(ANSIColors.white.rawValue)⏳ Running \(echo)
+                            \(ANSIColors.green.rawValue)✔ \(echo) has successfully executed\n\n
+                            """
+        let hook = Hook(
+                hookType: .preCommit,
+                verbose: false,
+                commands: [Command(run: Run(command: "echo \"Shusky is ready, please configure .shusky.yml\""))])
+        let printerMock = PrinterMock()
+        let commandHandler = HookHandler(hook: hook, shell: ShellMock(commandOutput: "Shusky is ready, please configure .shusky.yml", statusCode: 0), printer: printerMock)
+
+        XCTAssertEqual(commandHandler.run(), 0)
+        XCTAssertEqual(printerMock.output, consoleResult)
+    }
+
+    func testLocalVerboseTrueAndGlobalVerboseFalse() {
+        let consoleResult = """
+                            \(ANSIColors.white.rawValue)⏳ Running \(echo)
+                            Shusky is ready, please configure .shusky.yml
+                            \(ANSIColors.green.rawValue)✔ \(echo) has successfully executed\n\n
+                            """
+        let hook = Hook(
+                hookType: .preCommit,
+                verbose: false,
+                commands: [Command(run: Run(
+                        command: "echo \"Shusky is ready, please configure .shusky.yml\"",
+                        verbose: true)
+                )])
+        let printerMock = PrinterMock()
+        let commandHandler = HookHandler(hook: hook, shell: ShellMock(commandOutput: "Shusky is ready, please configure .shusky.yml", statusCode: 0), printer: printerMock)
+
+        XCTAssertEqual(commandHandler.run(), 0)
+        XCTAssertEqual(printerMock.output, consoleResult)
+    }
+
+    func testLocalVerboseFalseAndGlobalVerboseTrue() {
+        let consoleResult = """
+                            \(ANSIColors.white.rawValue)⏳ Running \(echo)
+                            \(ANSIColors.green.rawValue)✔ \(echo) has successfully executed\n\n
+                            """
+        let hook = Hook(
+                hookType: .preCommit,
+                verbose: true,
+                commands: [Command(run: Run(
+                        command: "echo \"Shusky is ready, please configure .shusky.yml\"",
+                        verbose: false)
+                )])
+        let printerMock = PrinterMock()
+        let commandHandler = HookHandler(hook: hook, shell: ShellMock(commandOutput: "Shusky is ready, please configure .shusky.yml", statusCode: 0), printer: printerMock)
+
+        XCTAssertEqual(commandHandler.run(), 0)
+        XCTAssertEqual(printerMock.output, consoleResult)
+    }
+
+    func testLocalVerboseTrueAndGlobalVerboseTrue() {
+        let consoleResult = """
+                            \(ANSIColors.white.rawValue)⏳ Running \(echo)
+                            Shusky is ready, please configure .shusky.yml
+                            \(ANSIColors.green.rawValue)✔ \(echo) has successfully executed\n\n
+                            """
+        let hook = Hook(
+                hookType: .preCommit,
+                verbose: true,
+                commands: [Command(run: Run(
+                        command: "echo \"Shusky is ready, please configure .shusky.yml\"",
+                        verbose: true)
+                )])
+        let printerMock = PrinterMock()
+        let commandHandler = HookHandler(hook: hook, shell: Shell(), printer: printerMock)
+
+        XCTAssertEqual(commandHandler.run(), 0)
+        XCTAssertEqual(printerMock.output, consoleResult)
+    }
+
+    func testCommandFails() {
+        let consoleResult = """
+                           \(ANSIColors.white.rawValue)⏳ Running \(echo)
+                           Shusky is ready, please configure .shusky.yml
+                           \(ANSIColors.red.rawValue)❌ \(echo) has failed with error 32\n\n
+                           """
+        let hook = Hook(
+                hookType: .preCommit,
+                verbose: true,
+                commands: [Command(run: Run(command: echo))])
+        let printerMock = PrinterMock()
+        let commandHandler = HookHandler(
+                hook: hook,
+                shell: ShellMock(commandOutput: "Shusky is ready, please configure .shusky.yml", statusCode: 32),
+                printer: printerMock
         )
-        // Empty the test folder to ensure a clean state
-        try! testFolder.empty(includingHidden: true)
-        try! testFolder.createSubfolder(at: path)
-
-        // Make the temp folder the current working folder
-        let fileManager = FileManager.default
-        fileManager.changeCurrentDirectoryPath(testFolder.path)
+        XCTAssertEqual(commandHandler.run(), 32)
+        XCTAssertEqual(printerMock.output, consoleResult)
     }
 
-    override func tearDown() {
-        try! testFolder.empty()
+    func testCommandFailsButIsDefinedAsNonCritical() {
+        let consoleResult = """
+                            \(ANSIColors.white.rawValue)⏳ Running \(echo)
+                            Shusky is ready, please configure .shusky.yml
+                            \(ANSIColors.yellow.rawValue)⚠️ \(echo) has failed with error 32\n\n
+                            """
+        let hook = Hook(
+                hookType: .preCommit,
+                verbose: true,
+                commands: [Command(run: Run(
+                        command: "echo \"Shusky is ready, please configure .shusky.yml\"",
+                        critical: false)
+                )])
+        let printerMock = PrinterMock()
+        let commandHandler = HookHandler(
+                hook: hook,
+                shell: ShellMock(commandOutput: "Shusky is ready, please configure .shusky.yml", statusCode: 32),
+                printer: printerMock
+        )
+
+        XCTAssertEqual(commandHandler.run(), 0)
+        XCTAssertEqual(printerMock.output, consoleResult)
     }
-
-    func testCreateHookFileIfNotExists() throws {
-        _ = try HookHandler(hook: .preCommit, path: path)
-        let file = try File(path: path + HookType.preCommit.rawValue)
-        XCTAssertNotNil(try file.read())
-    }
-
-    func testAddHook() throws {
-        let expectedContent = "swift run -c release shusky run pre-commit"
-        _ = try HookHandler(hook: .preCommit, path: path)
-        let file = try File(path: path + HookType.preCommit.rawValue)
-        let actualContent = try file.readAsString()
-        XCTAssertEqual(actualContent, expectedContent)
-    }
-
-    func testAddHookWithPackagePath() throws {
-        let expectedContent = "swift run -c release --package-path BuildTools shusky run pre-commit"
-        _ = try HookHandler(hook: .preCommit, path: path, packagePath: "BuildTools")
-        let file = try File(path: path + HookType.preCommit.rawValue)
-        let actualContent = try file.readAsString()
-        XCTAssertEqual(actualContent, expectedContent)
-    }
-
-    func testAppendHook() throws {
-        let folder = try Folder(path: path)
-        let file = try folder.createFileIfNeeded(at: HookType.preCommit.rawValue)
-        let content = "Write some content"
-        try file.write(content)
-
-        let expectedContent = content + "\nswift run -c release shusky run pre-commit\n"
-        _ = try HookHandler(hook: .preCommit, path: path)
-
-        let actualContent = try file.readAsString()
-
-        XCTAssertEqual(actualContent, expectedContent)
-
-    }
-
-    func testAppendHookWithPackagePath() throws {
-        let folder = try Folder(path: path)
-        let file = try folder.createFileIfNeeded(at: HookType.preCommit.rawValue)
-        let content = "Write some content"
-        try file.write(content)
-
-        let expectedContent = content + "\nswift run -c release --package-path BuildTools shusky run pre-commit\n"
-        _ = try HookHandler(hook: .preCommit, path: path, packagePath: "BuildTools")
-        let actualContent = try file.readAsString()
-
-        XCTAssertEqual(actualContent, expectedContent)
-    }
-
-    func testDontAppendHookIfAlreadyExist() throws {
-        let folder = try Folder(path: path)
-        let file = try folder.createFileIfNeeded(at: HookType.preCommit.rawValue)
-        let expectedContent = "swift run -c release shusky run pre-commit"
-        try file.write(expectedContent)
-
-        _ = try HookHandler(hook: .preCommit, path: path)
-        let actualContent = try file.readAsString()
-        XCTAssertEqual(actualContent, expectedContent)
-    }
-
-    func testDontAppendHookWithPackagePathIfAlreadyExist() throws {
-        let folder = try Folder(path: path)
-        let file = try folder.createFileIfNeeded(at: HookType.preCommit.rawValue)
-        let expectedContent = "swift run -c release --package-path BuildTools shusky run pre-commit"
-        try file.write(expectedContent)
-
-        _ = try HookHandler(hook: .preCommit, path: path, packagePath: "BuildTools")
-        let actualContent = try file.readAsString()
-        XCTAssertEqual(actualContent, expectedContent)
-    }
-
-    func testExecutionPermissions() throws {
-        _ = try HookHandler(hook: .preCommit, path: path, packagePath: "BuildTools")
-        let fm = FileManager.default
-        let attributes = try fm.attributesOfItem(atPath: path + HookType.preCommit.rawValue)
-        XCTAssertEqual(attributes[.posixPermissions] as? Int, Optional(777))
-    }
-
-    // Returns path to the built products directory.
-    var productsDirectory: URL {
-        #if os(macOS)
-        for bundle in Bundle.allBundles where bundle.bundlePath.hasSuffix(".xctest") {
-            return bundle.bundleURL.deletingLastPathComponent()
-        }
-        fatalError("couldn't find the products directory")
-        #else
-        return Bundle.main.bundleURL
-        #endif
-    }
-
 }
