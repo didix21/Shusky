@@ -110,7 +110,7 @@ final class GitHookFileHandlerTests: XCTestCase {
         _ = try GitHookFileHandler(hook: .preCommit, path: path, packagePath: "BuildTools")
         let fm = FileManager.default
         let attributes = try fm.attributesOfItem(atPath: path + HookType.preCommit.rawValue)
-        XCTAssertEqual(attributes[.posixPermissions] as? Int, Optional(777))
+        XCTAssertEqual(attributes[.posixPermissions] as? Int, Optional(0o755))
     }
 
     // Returns path to the built products directory.

@@ -4,9 +4,9 @@
 
 import Foundation
 
-struct ShellResult: Equatable {
-    let output: String
-    let status: Int32
+public struct ShellResult: Equatable {
+    public let output: String
+    public let status: Int32
 }
 
 protocol Executable {
@@ -14,7 +14,7 @@ protocol Executable {
     func executeWithRTProgress(_ command: String, rtOut: @escaping (_ progres: String) -> ()) -> ShellResult
 }
 
-final class Shell: Executable {
+public final class Shell: Executable {
     private(set) var launchPath: String = "/bin/bash"
     private var task: Process = Process()
     private var pipe: Pipe = Pipe()

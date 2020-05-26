@@ -39,7 +39,7 @@ public final class ShuskyCore {
         return 1
     }
 
-    public func install(gitPath: String, shuskyPath: String? = nil, packagePath: String? = nil) {
+    public func install(gitPath: String, shuskyPath: String? = nil, packagePath: String? = nil) -> Int32 {
         let shuskyFile = ShuskyFile(path: shuskyPath)
         do {
             try shuskyFile.createDefaultShuskyYaml()
@@ -47,16 +47,25 @@ public final class ShuskyCore {
             for hookAvailable in hooksParser.availableHooks {
                 _ = try GitHookFileHandler(hook: hookAvailable, path: gitPath, packagePath: packagePath)
             }
+
+            return 0
+
         } catch let error as ShuskyParserError {
             printer.printc(.red, error.description())
         } catch {
             printer.printc(.red, "Unexpected error: \(error)")
         }
+
+        return 1
     }
 
     private func executeCommand(hook: Hook) -> Int32 {
         let commandHandler = HookHandler(hook: hook, shell: Shell(), printer: printer)
         return commandHandler.run()
+    }
+
+    public func uninstall() -> Int32 {
+        1
     }
 
 }

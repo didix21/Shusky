@@ -24,6 +24,7 @@ class GitHookFileHandler: Writable, Readable {
         if let content = try? read() {
             guard !content.contains(hookCommand()) else { return }
             try append("\n" + hookCommand() + "\n")
+            try setUserExecutablePermissions()
             return
         }
         try create()
@@ -44,8 +45,9 @@ class GitHookFileHandler: Writable, Readable {
 
     private func setUserExecutablePermissions() throws {
         let fm = FileManager.default
-        var attributes = [FileAttributeKey: Any]()
-        attributes[.posixPermissions] = 777
+        let attributes: [FileAttributeKey: Any] = [
+            .posixPermissions: 0o755
+        ]
         try fm.setAttributes(attributes, ofItemAtPath: path + fileName)
     }
 

@@ -4,11 +4,14 @@
 import PackageDescription
 
 let package = Package(
-    name: "Shusky",
+    name: "Shusky", 
+    products: [
+            .executable(name: "shusky", targets: ["Shusky"])
+    ],
     dependencies: [
         .package(url: "https://github.com/jpsim/Yams.git", from: "3.0.0"),
-        .package(url: "https://github.com/apple/swift-log.git", from: "1.2.0"),
         .package(url: "https://github.com/JohnSundell/Files", from: "4.1.1"),
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "0.0.1"),
     ],
     targets: [
         .target(
@@ -17,7 +20,7 @@ let package = Package(
                 "ShuskyCore",
                 "Yams",
                 "Files",
-                .product(name: "Logging", package: "swift-log")
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
             ]
         ),
         .target(
@@ -25,12 +28,11 @@ let package = Package(
             dependencies: [
                 "Yams",
                 "Files",
-                .product(name: "Logging", package: "swift-log")
             ]
         ),
         .testTarget(
             name: "ShuskyTests",
-            dependencies: ["Shusky"]
+            dependencies: ["Shusky", .product(name: "ArgumentParser", package: "swift-argument-parser"),]
         ),
         .testTarget(
             name: "ShuskyCoreTests",
@@ -38,7 +40,6 @@ let package = Package(
                 "ShuskyCore",
                 "Yams",
                 "Files",
-                .product(name: "Logging", package: "swift-log")
             ]
         )
     ]
