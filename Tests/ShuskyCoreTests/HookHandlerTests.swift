@@ -102,6 +102,27 @@ final class HookHandlerTests: XCTestCase {
         XCTAssertEqual(printerMock.output, consoleResult)
     }
 
+
+    func testIfVerboseIsSetFalseAndCommandFailsDisplayResult() {
+        let consoleResult = """
+                            \(ANSIColors.white.rawValue)⏳ Running \(echo)
+                            Shusky is ready, please configure .shusky.yml
+                            \(ANSIColors.red.rawValue)❌ \(echo) has failed with error 32\n\n
+                            """
+        let hook = Hook(
+                hookType: .preCommit,
+                verbose: false,
+                commands: [Command(run: Run(command: echo))])
+        let printerMock = PrinterMock()
+        let commandHandler = HookHandler(
+                hook: hook,
+                shell: ShellMock(commandOutput: "Shusky is ready, please configure .shusky.yml", statusCode: 32),
+                printer: printerMock
+        )
+        XCTAssertEqual(commandHandler.run(), 32)
+        XCTAssertEqual(printerMock.output, consoleResult)
+    }
+
     func testCommandFails() {
         let consoleResult = """
                            \(ANSIColors.white.rawValue)⏳ Running \(echo)

@@ -1,7 +1,7 @@
+pre-push:
+    - set -o pipefail && swift test 2>&1 | xcpretty --color
 pre-commit:
     - run: 
         command: set -o pipefail && swift test 2>&1 | xcpretty --color   
-        critical: true
-    - echo "Shusky is ready, please configure .shusky.yml"
-    - echo "Another command"
-    - echo "Third command"
+        critical: false
+        verbose: false

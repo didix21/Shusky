@@ -124,6 +124,9 @@ final class HookHandler {
         }
 
         guard result.status == 0 else {
+            if !isVerbose(command: command) {
+                printer.print(result.output)
+            }
             if !isCritical(command: command) {
                 return .isNotCritical(errorCode: result.status)
             }
