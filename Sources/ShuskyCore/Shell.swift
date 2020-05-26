@@ -11,7 +11,7 @@ public struct ShellResult: Equatable {
 
 protocol Executable {
     func execute(_ command: String) -> ShellResult
-    func executeWithRTProgress(_ command: String, rtOut: @escaping (_ progres: String) -> ()) -> ShellResult
+    func executeWithRTProgress(_ command: String, rtOut: @escaping (_ progres: String) -> Void) -> ShellResult
 }
 
 public final class Shell: Executable {
@@ -34,7 +34,7 @@ public final class Shell: Executable {
         return ShellResult(output: output, status: task.terminationStatus)
     }
 
-    public func executeWithRTProgress(_ command: String, rtOut: @escaping (_ progres: String) -> ()) -> ShellResult {
+    public func executeWithRTProgress(_ command: String, rtOut: @escaping (_ progres: String) -> Void) -> ShellResult {
         resetShell()
         configureShell(command)
         let outputHandler = pipe.fileHandleForReading
@@ -45,21 +45,22 @@ public final class Shell: Executable {
         let dataNotificationName = NSNotification.Name.NSFileHandleDataAvailable
         var dataObserver: NSObjectProtocol?
         dataObserver = notificationCenter.addObserver(
-                forName: dataNotificationName,
-                object: outputHandler, queue: nil) { notification in
-                    let data = outputHandler.availableData
-                    guard data.count > 0 else {
-                        if let dataObserver = dataObserver {
-                            notificationCenter.removeObserver(dataObserver)
-                        }
-                        return
-                    }
-                    if let line = String(data: data, encoding: .utf8) {
-                        rtOut(line)
-                        output += line
-                    }
-                    outputHandler.waitForDataInBackgroundAndNotify()
+            forName: dataNotificationName,
+            object: outputHandler, queue: nil
+        ) { _ in
+            let data = outputHandler.availableData
+            guard data.count > 0 else {
+                if let dataObserver = dataObserver {
+                    notificationCenter.removeObserver(dataObserver)
                 }
+                return
+            }
+            if let line = String(data: data, encoding: .utf8) {
+                rtOut(line)
+                output += line
+            }
+            outputHandler.waitForDataInBackgroundAndNotify()
+        }
         task.launch()
         task.waitUntilExit()
         return ShellResult(output: output, status: task.terminationStatus)

@@ -6,11 +6,10 @@ import Foundation
 import Yams
 
 public final class ShuskyCore {
-
     let printer = Printer()
-    public init() { }
+    public init() {}
 
-    public func run(hookType: HookType, shuskyPath: String? = nil, packagePath: String? = nil) -> Int32 {
+    public func run(hookType: HookType, shuskyPath: String? = nil, packagePath _: String? = nil) -> Int32 {
         let shuskyFile = ShuskyFile(path: shuskyPath)
         do {
             let shuskyParser = try ShuskyHookParser(hookType: hookType, yamlContent: try shuskyFile.read())
@@ -22,7 +21,7 @@ public final class ShuskyCore {
 
         } catch let error as ShuskyParserError {
             switch error {
-            case .invalidHook(let hookError):
+            case let .invalidHook(hookError):
                 switch hookError {
                 case .noHookFound:
                     return 0
@@ -67,5 +66,4 @@ public final class ShuskyCore {
     public func uninstall() -> Int32 {
         1
     }
-
 }

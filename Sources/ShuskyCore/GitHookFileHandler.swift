@@ -5,16 +5,14 @@
 import Foundation
 
 class GitHookFileHandler: Writable, Readable {
-
     private(set) var fileName: String
     var path: String
     private var hook: HookType
     private var packagePath: String?
 
-
     public init(hook: HookType, path: String, packagePath: String? = nil) throws {
         self.hook = hook
-        self.fileName = hook.rawValue
+        fileName = hook.rawValue
         self.path = path
         self.packagePath = packagePath
         try addHook()
@@ -46,9 +44,8 @@ class GitHookFileHandler: Writable, Readable {
     private func setUserExecutablePermissions() throws {
         let fm = FileManager.default
         let attributes: [FileAttributeKey: Any] = [
-            .posixPermissions: 0o755
+            .posixPermissions: 0o755,
         ]
         try fm.setAttributes(attributes, ofItemAtPath: path + fileName)
     }
-
 }

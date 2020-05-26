@@ -2,13 +2,12 @@
 // Created by Dídac Coll Pujals on 16/05/2020.
 //
 
-import Foundation
 import Files
-import XCTest
+import Foundation
 @testable import ShuskyCore
+import XCTest
 
 final class GitHookFileHandlerTests: XCTestCase {
-
     let tmpFolder = Folder.temporary
     var testFolder: Folder!
     var shuskyFile: ShuskyFile!
@@ -19,7 +18,7 @@ final class GitHookFileHandlerTests: XCTestCase {
         shuskyFile = ShuskyFile()
         // Setup a temp test folder that can be used as a sandbox
         testFolder = try! tmpFolder.createSubfolderIfNeeded(
-                withName: gitPath
+            withName: gitPath
         )
         // Empty the test folder to ensure a clean state
         try! testFolder.empty(includingHidden: true)
@@ -68,7 +67,6 @@ final class GitHookFileHandlerTests: XCTestCase {
         let actualContent = try file.readAsString()
 
         XCTAssertEqual(actualContent, expectedContent)
-
     }
 
     func testAppendHookWithPackagePath() throws {
@@ -116,13 +114,12 @@ final class GitHookFileHandlerTests: XCTestCase {
     // Returns path to the built products directory.
     var productsDirectory: URL {
         #if os(macOS)
-        for bundle in Bundle.allBundles where bundle.bundlePath.hasSuffix(".xctest") {
-            return bundle.bundleURL.deletingLastPathComponent()
-        }
-        fatalError("couldn't find the products directory")
+            for bundle in Bundle.allBundles where bundle.bundlePath.hasSuffix(".xctest") {
+                return bundle.bundleURL.deletingLastPathComponent()
+            }
+            fatalError("couldn't find the products directory")
         #else
-        return Bundle.main.bundleURL
+            return Bundle.main.bundleURL
         #endif
     }
-
 }

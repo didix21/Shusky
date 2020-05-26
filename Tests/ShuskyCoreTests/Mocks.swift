@@ -46,19 +46,18 @@ final class ShellMock: Executable {
     private let statusCode: Int32
 
     init(commandOutput: String, statusCode: Int32) {
-        self.output = commandOutput
+        output = commandOutput
         self.statusCode = statusCode
     }
-    func execute(_ command: String) -> ShellResult {
+
+    func execute(_: String) -> ShellResult {
         executeIsCalled = true
         return ShellResult(output: output, status: statusCode)
     }
 
-    func executeWithRTProgress(_ command: String, rtOut: @escaping (String) -> ()) -> ShellResult {
+    func executeWithRTProgress(_: String, rtOut: @escaping (String) -> Void) -> ShellResult {
         executeWithRTProgressIsCalled = true
         rtOut(output)
         return ShellResult(output: output, status: statusCode)
     }
-
-
 }

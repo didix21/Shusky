@@ -1,5 +1,5 @@
-import XCTest
 import class Foundation.Bundle
+import XCTest
 
 final class ShuskyTests: XCTestCase {
     func testExample() throws {
@@ -26,19 +26,19 @@ final class ShuskyTests: XCTestCase {
 //        let data = pipe.fileHandleForReading.readDataToEndOfFile()
 //        let output = String(data: data, encoding: .utf8)
 
-      //  XCTAssertEqual(output, "Hello, world!\n")
+        //  XCTAssertEqual(output, "Hello, world!\n")
     }
 
     /// Returns path to the built products directory.
     var productsDirectory: URL {
-      #if os(macOS)
-        for bundle in Bundle.allBundles where bundle.bundlePath.hasSuffix(".xctest") {
-            return bundle.bundleURL.deletingLastPathComponent()
-        }
-        fatalError("couldn't find the products directory")
-      #else
-        return Bundle.main.bundleURL
-      #endif
+        #if os(macOS)
+            for bundle in Bundle.allBundles where bundle.bundlePath.hasSuffix(".xctest") {
+                return bundle.bundleURL.deletingLastPathComponent()
+            }
+            fatalError("couldn't find the products directory")
+        #else
+            return Bundle.main.bundleURL
+        #endif
     }
 
     static var allTests = [

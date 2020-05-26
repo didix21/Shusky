@@ -1,11 +1,11 @@
 import Foundation
-import Yams
 import ShuskyCore
+import Yams
 
 let fileManager = FileManager.default
 fileManager.changeCurrentDirectoryPath("/Users/didaccoll/repos/Shusky")
-//let shuskyCore = ShuskyCore()
-//shuskyCore.run(hookType: .preCommit)
+// let shuskyCore = ShuskyCore()
+// shuskyCore.run(hookType: .preCommit)
 
 import ArgumentParser
 
@@ -18,8 +18,9 @@ enum ShuskyError: Error {
 
 struct Shusky: ParsableCommand {
     static let configuration = CommandConfiguration(
-            abstract: "Shusky utilities.",
-            subcommands: [Install.self, Run.self, Uninstall.self])
+        abstract: "Shusky utilities.",
+        subcommands: [Install.self, Run.self, Uninstall.self]
+    )
 
     struct Install: ParsableCommand {
         static let configuration = CommandConfiguration(abstract: "Install all hooks available in .shusky.yml.")
@@ -41,7 +42,7 @@ struct Shusky: ParsableCommand {
 
     struct Run: ParsableCommand {
         static let configuration = CommandConfiguration(
-                abstract: "Use this command for running a hook in the .swift.yml"
+            abstract: "Use this command for running a hook in the .swift.yml"
         )
 
         @Option(help: "Set Swift Package Manager path, if Package.swift is not in the root.")
@@ -65,7 +66,7 @@ struct Shusky: ParsableCommand {
 
     struct Uninstall: ParsableCommand {
         static let configuration = CommandConfiguration(
-                abstract: "Uninstall shusky"
+            abstract: "Uninstall shusky"
         )
 
         func run() throws {
@@ -75,7 +76,6 @@ struct Shusky: ParsableCommand {
             }
         }
     }
-
 }
 
 Shusky.main()

@@ -87,7 +87,7 @@ final class HookHandler {
             printer.printState(.running, command)
             let result = getResult(command: command)
             switch result {
-            case .error(let errorCode):
+            case let .error(errorCode):
                 printer.printState(result, command)
                 return errorCode
             default:
@@ -162,14 +162,11 @@ final class HookHandler {
                 return "⏳ Running \(command)"
             case .success:
                 return "✔ \(command) has successfully executed\n"
-            case .error(let errorCode):
+            case let .error(errorCode):
                 return "❌ \(command) has failed with error \(errorCode)\n"
-            case .isNotCritical(let errorCode):
+            case let .isNotCritical(errorCode):
                 return "⚠️ \(command) has failed with error \(errorCode)\n"
-
             }
         }
-        
     }
-
 }

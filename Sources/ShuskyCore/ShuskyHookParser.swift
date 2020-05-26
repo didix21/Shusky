@@ -33,7 +33,7 @@ public enum ShuskyParserError: Error, Equatable, Describable {
             return "☣️ \(shusky) hasn't the expected format!"
         case .noHooksFound:
             return "☣️ There isn't any hook in \(shusky)!"
-        case .invalidHook(let error):
+        case let .invalidHook(error):
             return "☣️ In \(shusky) there is an invalid \(error.description())!"
         }
     }
@@ -47,18 +47,17 @@ class ShuskyHookParser: Yamable {
     public init(hookType: HookType, yamlContent: String) throws {
         self.hookType = hookType
         self.yamlContent = yamlContent
-        self.hook = try self.parse()
+        hook = try parse()
     }
 
     private func parse() throws -> Hook {
-        let data = try self.load(yamlContent)
+        let data = try load(yamlContent)
         do {
             return try Hook.parse(hookType: hookType, data)
         } catch let error as Hook.HookError {
             throw ShuskyParserError.invalidHook(error)
         }
     }
-
 }
 
 class ShuskyHooksParser: Yamable {
@@ -71,10 +70,10 @@ class ShuskyHooksParser: Yamable {
     }
 
     private func parse() throws {
-        let data = try self.load(yaml)
+        let data = try load(yaml)
 
         for hookType in HookType.getAll() {
-            guard ((data[hookType.rawValue] as? [Any]) != nil) else { continue }
+            guard (data[hookType.rawValue] as? [Any]) != nil else { continue }
             availableHooks.append(hookType)
         }
 
