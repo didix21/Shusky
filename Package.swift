@@ -4,9 +4,9 @@
 import PackageDescription
 
 let package = Package(
-    name: "Shusky", 
+    name: "Shusky",
     products: [
-            .executable(name: "shusky", targets: ["Shusky"])
+        .executable(name: "shusky", targets: ["Shusky"]),
     ],
     dependencies: [
         .package(url: "https://github.com/jpsim/Yams.git", from: "3.0.0"),
@@ -24,7 +24,7 @@ let package = Package(
             ]
         ),
         .target(
-	    name: "ShuskyCore",
+            name: "ShuskyCore",
             dependencies: [
                 "Yams",
                 "Files",
@@ -32,7 +32,7 @@ let package = Package(
         ),
         .testTarget(
             name: "ShuskyTests",
-            dependencies: ["Shusky", .product(name: "ArgumentParser", package: "swift-argument-parser"),]
+            dependencies: ["Shusky", .product(name: "ArgumentParser", package: "swift-argument-parser")]
         ),
         .testTarget(
             name: "ShuskyCoreTests",
@@ -41,6 +41,6 @@ let package = Package(
                 "Yams",
                 "Files",
             ]
-        )
+        ),
     ]
 )

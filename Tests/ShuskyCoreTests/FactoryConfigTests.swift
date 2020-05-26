@@ -14,9 +14,9 @@ enum HookConfigTests {
         var yaml = ""
         for key in keys {
             switch key {
-            case .verbose(let verbose): yaml += newYmlKey(.verbose, verbose)
-            case .hookType(let hookType): yaml += "\(hookType.rawValue): \n"
-            case .commands(let commands):
+            case let .verbose(verbose): yaml += newYmlKey(.verbose, verbose)
+            case let .hookType(hookType): yaml += "\(hookType.rawValue): \n"
+            case let .commands(commands):
                 for command in commands {
                     guard let commandConfig = command as? CommandConfigTests else {
                         yaml += "-    \(command)\n"
@@ -39,7 +39,7 @@ enum CommandConfigTests {
 
     func mapToStr() -> String {
         switch self {
-        case .run(let runConfig): return RunConfigTests.mapToStr(runConfig)
+        case let .run(runConfig): return RunConfigTests.mapToStr(runConfig)
         }
     }
 }
@@ -52,18 +52,18 @@ enum RunConfigTests {
 
     static func mapToStr(_ keys: [RunConfigTests]) -> String {
         let run = """
-                      run:\n
-                  """
+            run:\n
+        """
         var yaml = run
         for key in keys {
             switch key {
-            case .command(let command):
+            case let .command(command):
                 yaml += newYmlKey(.command, command)
-            case .path(let path):
+            case let .path(path):
                 yaml += newYmlKey(.path, path)
-            case .critical(let critical):
+            case let .critical(critical):
                 yaml += newYmlKey(.critical, critical)
-            case .verbose(let verbose):
+            case let .verbose(verbose):
                 yaml += newYmlKey(.verbose, verbose)
             }
         }

@@ -1,0 +1,5 @@
+--exclude .build, BuildTools/.build
+--wraparguments before-first
+--wrapcollections before-first
+--disable trailingClosures
+--maxwidth 120

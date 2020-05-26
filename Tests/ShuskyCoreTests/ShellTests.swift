@@ -3,12 +3,12 @@
 //
 
 import Foundation
-import XCTest
 @testable import ShuskyCore
+import XCTest
 
 final class ShellTests: XCTestCase {
     let printSomething = "print something"
-    lazy var echo = "echo \(printSomething)" 
+    lazy var echo = "echo \(printSomething)"
 
     func testShellExecute() {
         let shell = Shell()
@@ -24,5 +24,4 @@ final class ShellTests: XCTestCase {
         }
         XCTAssertEqual(result, expected)
     }
-
 }

@@ -24,9 +24,20 @@ public enum HookType: String {
     case prePush = "pre-push"
 
     static func getAll() -> [HookType] {
-        [.applypatchMsg, preApplyPatch, .postApplyPatch, .preCommit,
-         .preMergeCommit, .prepareCommitMsg, .commitMsg, .postCommit,
-         .preRebase, .postCheckout, .postMerge, .prePush]
+        [
+            .applypatchMsg,
+            preApplyPatch,
+            .postApplyPatch,
+            .preCommit,
+            .preMergeCommit,
+            .prepareCommitMsg,
+            .commitMsg,
+            .postCommit,
+            .preRebase,
+            .postCheckout,
+            .postMerge,
+            .prePush,
+        ]
     }
 }
 
@@ -36,15 +47,14 @@ public struct Hook: Equatable {
     public var commands: [Command]
 
     public static func parse(hookType: HookType, _ data: [String: Any]) throws -> Hook {
-
         guard let hook = data[hookType.rawValue] as? [Any] else {
-            if  data[hookType.rawValue] != nil {
+            if data[hookType.rawValue] != nil {
                 throw HookError.hookIsEmpty(hookType)
             }
             throw HookError.noHookFound
         }
 
-        let commands = try self.parse(hookType, hook: hook)
+        let commands = try parse(hookType, hook: hook)
 
         guard let verbose = data[ShuskyCodingKey.verbose.rawValue] as? Bool else {
             guard let content = data[ShuskyCodingKey.verbose.rawValue] else {
@@ -59,7 +69,7 @@ public struct Hook: Equatable {
     private static func parse(_ hookType: HookType, hook: [Any]) throws -> [Command] {
         var commands: [Command] = []
 
-        for command in hook  {
+        for command in hook {
             do {
                 commands.append(try Command.parse(command))
             } catch let error as Command.CommandError {
@@ -70,10 +80,10 @@ public struct Hook: Equatable {
         return commands
     }
 
-    public static func ==(lhs: Hook, rhs: Hook) -> Bool {
+    public static func == (lhs: Hook, rhs: Hook) -> Bool {
         lhs.hookType == rhs.hookType &&
-                lhs.verbose == rhs.verbose &&
-                lhs.commands == rhs.commands
+            lhs.verbose == rhs.verbose &&
+            lhs.commands == rhs.commands
     }
 
     public enum ShuskyCodingKey: String {
@@ -90,11 +100,11 @@ public struct Hook: Equatable {
             switch self {
             case .noHookFound:
                 return "no hook found"
-            case .hookIsEmpty(let hook):
+            case let .hookIsEmpty(hook):
                 return "hook: \(hook.rawValue) is empty"
-            case .invalidTypeInHookKey(let key, let content):
+            case let .invalidTypeInHookKey(key, content):
                 return "invalid type in \(key.rawValue): \(content)"
-            case .invalidCommand(let hook, let error):
+            case let .invalidCommand(hook, error):
                 return "invalid command in \(hook.rawValue): \(error.description())"
             }
         }
@@ -124,7 +134,7 @@ public struct Command: Equatable {
         throw CommandError.noCommands
     }
 
-    public static func ==(lhs: Command, rhs: Command) -> Bool {
+    public static func == (lhs: Command, rhs: Command) -> Bool {
         lhs.run == rhs.run
     }
 
@@ -139,11 +149,11 @@ public struct Command: Equatable {
 
         public func description() -> String {
             switch self {
-            case .invalidData(let data):
+            case let .invalidData(data):
                 return "invalid data: \(data)"
             case .noCommands:
                 return "has any command"
-            case .invalidRun(let key, let error):
+            case let .invalidRun(key, error):
                 return "invalid \(key): \(error.description())"
             }
         }
@@ -157,12 +167,11 @@ public struct Run: Equatable {
     public var verbose: Bool?
 
     public static func parse(_ data: Any) throws -> Run {
-
         guard let runContent = data as? [String: Any] else {
             throw RunError.invalidData("\(data)")
         }
 
-        return try self.parse(data: runContent)
+        return try parse(data: runContent)
     }
 
     public static func parse(data: [String: Any]) throws -> Run {
@@ -207,7 +216,7 @@ public struct Run: Equatable {
             return shuskyTypes
         }
 
-        private func tryString( _ value: Any) throws -> String {
+        private func tryString(_ value: Any) throws -> String {
             guard let val = value as? String else {
                 throw RunError.invalidTypeInRunKey(self, "\(value)")
             }
@@ -220,7 +229,6 @@ public struct Run: Equatable {
             }
             return val
         }
-
     }
 
     public enum ShuskyCodingType {
@@ -237,10 +245,10 @@ public struct Run: Equatable {
 
             for key in keys {
                 switch key {
-                case .command(let value): optCommand = value
-                case .path(let value): path = value
-                case .critical(let value): critical = value
-                case .verbose(let value): verbose = value
+                case let .command(value): optCommand = value
+                case let .path(value): path = value
+                case let .critical(value): critical = value
+                case let .verbose(value): verbose = value
                 }
             }
 
@@ -249,7 +257,6 @@ public struct Run: Equatable {
             }
 
             return Run(command: command, path: path, critical: critical, verbose: verbose)
-
         }
     }
 
@@ -259,21 +266,17 @@ public struct Run: Equatable {
 
         public func description() -> String {
             switch self {
-            case .invalidData(let data):
+            case let .invalidData(data):
                 return "invalid data: \(data)"
-            case .invalidTypeInRunKey(let key, let content):
+            case let .invalidTypeInRunKey(key, content):
                 return "invalid type in \(key): \(content)"
             }
         }
     }
 
-    public static func ==(lhs: Run, rhs: Run) -> Bool {
+    public static func == (lhs: Run, rhs: Run) -> Bool {
         lhs.command == rhs.command &&
-                lhs.path == rhs.path &&
-                lhs.critical == rhs.critical
+            lhs.path == rhs.path &&
+            lhs.critical == rhs.critical
     }
 }
-
-
-
-

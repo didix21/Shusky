@@ -1,8 +1,8 @@
-import Foundation
-import XCTest
 import Files
-import Yams
+import Foundation
 @testable import ShuskyCore
+import XCTest
+import Yams
 
 final class ShuskyCoreTests: XCTestCase {
     let gitPath = ".git/hooks/"
@@ -17,7 +17,7 @@ final class ShuskyCoreTests: XCTestCase {
     override func setUp() {
         // Setup a temp test folder that can be used as a sandbox
         testFolder = try! tmpFolder.createSubfolderIfNeeded(
-                withName: "ShuskyCorePath"
+            withName: "ShuskyCorePath"
         )
         // Empty the test folder to ensure a clean state
         try! testFolder.empty(includingHidden: true)
@@ -41,25 +41,25 @@ final class ShuskyCoreTests: XCTestCase {
         let preCommitFile = try File(path: "\(gitPath)pre-commit")
 
         XCTAssertEqual(
-                try shuskyFile.readAsString(),
-                """
-                pre-commit:
-                    - echo "Shusky is ready, please configure \(self.shuskyFileName)
+            try shuskyFile.readAsString(),
+            """
+            pre-commit:
+                - echo "Shusky is ready, please configure \(shuskyFileName)
 
-                """
+            """
         )
         XCTAssertEqual(try preCommitFile.readAsString(), "swift run -c release shusky run pre-commit")
     }
 
     func testAddMultipleHooksIfTheyAreConfigured() throws {
         let config = """
-                     applypatch-msg:
-                        - echo print something
-                     pre-push:
-                        - echo print something
-                     pre-commit:
-                        - echo print something
-                     """
+        applypatch-msg:
+           - echo print something
+        pre-push:
+           - echo print something
+        pre-commit:
+           - echo print something
+        """
         let file = try testFolder.createFile(named: shuskyFileName)
         try file.write(config)
         let shuskyCore = ShuskyCore()
@@ -82,8 +82,8 @@ final class ShuskyCoreTests: XCTestCase {
 
     func testRunReturn1IfHookIsEmpty() throws {
         let config = """
-                     pre-commit:
-                     """
+        pre-commit:
+        """
         let file = try testFolder.createFile(named: shuskyFileName)
         try file.write(config)
         let shuskyCore = ShuskyCore()
@@ -94,11 +94,11 @@ final class ShuskyCoreTests: XCTestCase {
 
     func testRunReturns0IfHookIsNotDefined() throws {
         let config = """
-                     applypatch-msg:
-                        - echo print something
-                     pre-push:
-                        - echo print something
-                     """
+        applypatch-msg:
+           - echo print something
+        pre-push:
+           - echo print something
+        """
         let file = try testFolder.createFile(named: shuskyFileName)
         try file.write(config)
         let shuskyCore = ShuskyCore()
@@ -109,11 +109,11 @@ final class ShuskyCoreTests: XCTestCase {
 
     func testRunReturnTheCodeErrorOfCommandThatHasFailed() throws {
         let config = """
-                     applypatch-msg:
-                        - echo print something
-                     pre-push:
-                        - exit 19
-                     """
+        applypatch-msg:
+           - echo print something
+        pre-push:
+           - exit 19
+        """
         let file = try testFolder.createFile(named: shuskyFileName)
         try file.write(config)
         let shuskyCore = ShuskyCore()
@@ -124,13 +124,13 @@ final class ShuskyCoreTests: XCTestCase {
 
     func testRunReturn0IfAllCommandsAreExecuted() throws {
         let config = """
-                     applypatch-msg:
-                        - echo print something
-                     pre-push:
-                        - echo command 1
-                        - echo command 2
-                        - echo command 3
-                     """
+        applypatch-msg:
+           - echo print something
+        pre-push:
+           - echo command 1
+           - echo command 2
+           - echo command 3
+        """
         let file = try testFolder.createFile(named: shuskyFileName)
         try file.write(config)
         let shuskyCore = ShuskyCore()
@@ -138,5 +138,4 @@ final class ShuskyCoreTests: XCTestCase {
 
         XCTAssertEqual(exitCode, 0)
     }
-
 }

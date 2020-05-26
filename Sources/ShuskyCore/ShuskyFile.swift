@@ -1,13 +1,10 @@
-
-import Foundation
 import Files
-
+import Foundation
 
 public protocol Nameable {
     var fileName: String { get }
     var path: String { get set }
 }
-
 
 public protocol Readable: Nameable {
     func read() throws -> String
@@ -15,7 +12,7 @@ public protocol Readable: Nameable {
 
 extension Readable {
     public func read() throws -> String {
-        let file = try File(path: self.path + self.fileName)
+        let file = try File(path: path + fileName)
         return try file.readAsString()
     }
 }
@@ -26,19 +23,19 @@ public protocol Writable: Nameable {
     func append(_ string: String) throws
 }
 
-extension  Writable {
+extension Writable {
     func create() throws {
-       let folder = try Folder(path: self.path)
-       _ = try folder.createFileIfNeeded(withName: self.fileName)
+        let folder = try Folder(path: path)
+        _ = try folder.createFileIfNeeded(withName: fileName)
     }
 
     func write(_ string: String) throws {
-        let file = try File(path: self.path + self.fileName)
+        let file = try File(path: path + fileName)
         try file.write(string)
     }
 
     func append(_ string: String) throws {
-        let file = try File(path: self.path + self.fileName)
+        let file = try File(path: path + fileName)
         try file.append(string)
     }
 }
@@ -50,7 +47,7 @@ class ShuskyFile: Readable, Writable {
     public var defaultConfig: String {
         """
         pre-commit:
-            - echo "Shusky is ready, please configure \(self.fileName)
+            - echo "Shusky is ready, please configure \(fileName)
 
         """
     }
@@ -71,7 +68,4 @@ class ShuskyFile: Readable, Writable {
             try write(defaultConfig)
         }
     }
-
 }
-
-

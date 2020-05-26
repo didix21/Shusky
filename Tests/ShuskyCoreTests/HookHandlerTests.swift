@@ -3,25 +3,29 @@
 //
 
 import Foundation
-import XCTest
 @testable import ShuskyCore
-
+import XCTest
 
 final class HookHandlerTests: XCTestCase {
     let echo = "echo \"Shusky is ready, please configure .shusky.yml\""
 
     func testCommandHandler() {
         let consoleResult = """
-                            \(ANSIColors.white.rawValue)⏳ Running \(echo)
-                            Shusky is ready, please configure .shusky.yml
-                            \(ANSIColors.green.rawValue)✔ \(echo) has successfully executed\n\n
-                            """
+        \(ANSIColors.white.rawValue)⏳ Running \(echo)
+        Shusky is ready, please configure .shusky.yml
+        \(ANSIColors.green.rawValue)✔ \(echo) has successfully executed\n\n
+        """
         let hook = Hook(
-                hookType: .preCommit,
-                verbose: true,
-                commands: [Command(run: Run(command: echo))])
+            hookType: .preCommit,
+            verbose: true,
+            commands: [Command(run: Run(command: echo))]
+        )
         let printerMock = PrinterMock()
-        let commandHandler = HookHandler(hook: hook, shell: ShellMock(commandOutput: "Shusky is ready, please configure .shusky.yml", statusCode: 0), printer: printerMock)
+        let commandHandler = HookHandler(
+            hook: hook,
+            shell: ShellMock(commandOutput: "Shusky is ready, please configure .shusky.yml", statusCode: 0),
+            printer: printerMock
+        )
 
         XCTAssertEqual(commandHandler.run(), 0)
         XCTAssertEqual(printerMock.output, consoleResult)
@@ -29,15 +33,20 @@ final class HookHandlerTests: XCTestCase {
 
     func testCommandHandlerGlobalVerboseFalse() {
         let consoleResult = """
-                            \(ANSIColors.white.rawValue)⏳ Running \(echo)
-                            \(ANSIColors.green.rawValue)✔ \(echo) has successfully executed\n\n
-                            """
+        \(ANSIColors.white.rawValue)⏳ Running \(echo)
+        \(ANSIColors.green.rawValue)✔ \(echo) has successfully executed\n\n
+        """
         let hook = Hook(
-                hookType: .preCommit,
-                verbose: false,
-                commands: [Command(run: Run(command: "echo \"Shusky is ready, please configure .shusky.yml\""))])
+            hookType: .preCommit,
+            verbose: false,
+            commands: [Command(run: Run(command: "echo \"Shusky is ready, please configure .shusky.yml\""))]
+        )
         let printerMock = PrinterMock()
-        let commandHandler = HookHandler(hook: hook, shell: ShellMock(commandOutput: "Shusky is ready, please configure .shusky.yml", statusCode: 0), printer: printerMock)
+        let commandHandler = HookHandler(
+            hook: hook,
+            shell: ShellMock(commandOutput: "Shusky is ready, please configure .shusky.yml", statusCode: 0),
+            printer: printerMock
+        )
 
         XCTAssertEqual(commandHandler.run(), 0)
         XCTAssertEqual(printerMock.output, consoleResult)
@@ -45,19 +54,25 @@ final class HookHandlerTests: XCTestCase {
 
     func testLocalVerboseTrueAndGlobalVerboseFalse() {
         let consoleResult = """
-                            \(ANSIColors.white.rawValue)⏳ Running \(echo)
-                            Shusky is ready, please configure .shusky.yml
-                            \(ANSIColors.green.rawValue)✔ \(echo) has successfully executed\n\n
-                            """
+        \(ANSIColors.white.rawValue)⏳ Running \(echo)
+        Shusky is ready, please configure .shusky.yml
+        \(ANSIColors.green.rawValue)✔ \(echo) has successfully executed\n\n
+        """
         let hook = Hook(
-                hookType: .preCommit,
-                verbose: false,
-                commands: [Command(run: Run(
-                        command: "echo \"Shusky is ready, please configure .shusky.yml\"",
-                        verbose: true)
-                )])
+            hookType: .preCommit,
+            verbose: false,
+            commands: [Command(run: Run(
+                command: "echo \"Shusky is ready, please configure .shusky.yml\"",
+                verbose: true
+            )
+                )]
+        )
         let printerMock = PrinterMock()
-        let commandHandler = HookHandler(hook: hook, shell: ShellMock(commandOutput: "Shusky is ready, please configure .shusky.yml", statusCode: 0), printer: printerMock)
+        let commandHandler = HookHandler(
+            hook: hook,
+            shell: ShellMock(commandOutput: "Shusky is ready, please configure .shusky.yml", statusCode: 0),
+            printer: printerMock
+        )
 
         XCTAssertEqual(commandHandler.run(), 0)
         XCTAssertEqual(printerMock.output, consoleResult)
@@ -65,18 +80,24 @@ final class HookHandlerTests: XCTestCase {
 
     func testLocalVerboseFalseAndGlobalVerboseTrue() {
         let consoleResult = """
-                            \(ANSIColors.white.rawValue)⏳ Running \(echo)
-                            \(ANSIColors.green.rawValue)✔ \(echo) has successfully executed\n\n
-                            """
+        \(ANSIColors.white.rawValue)⏳ Running \(echo)
+        \(ANSIColors.green.rawValue)✔ \(echo) has successfully executed\n\n
+        """
         let hook = Hook(
-                hookType: .preCommit,
-                verbose: true,
-                commands: [Command(run: Run(
-                        command: "echo \"Shusky is ready, please configure .shusky.yml\"",
-                        verbose: false)
-                )])
+            hookType: .preCommit,
+            verbose: true,
+            commands: [Command(run: Run(
+                command: "echo \"Shusky is ready, please configure .shusky.yml\"",
+                verbose: false
+            )
+                )]
+        )
         let printerMock = PrinterMock()
-        let commandHandler = HookHandler(hook: hook, shell: ShellMock(commandOutput: "Shusky is ready, please configure .shusky.yml", statusCode: 0), printer: printerMock)
+        let commandHandler = HookHandler(
+            hook: hook,
+            shell: ShellMock(commandOutput: "Shusky is ready, please configure .shusky.yml", statusCode: 0),
+            printer: printerMock
+        )
 
         XCTAssertEqual(commandHandler.run(), 0)
         XCTAssertEqual(printerMock.output, consoleResult)
@@ -84,17 +105,19 @@ final class HookHandlerTests: XCTestCase {
 
     func testLocalVerboseTrueAndGlobalVerboseTrue() {
         let consoleResult = """
-                            \(ANSIColors.white.rawValue)⏳ Running \(echo)
-                            Shusky is ready, please configure .shusky.yml
-                            \(ANSIColors.green.rawValue)✔ \(echo) has successfully executed\n\n
-                            """
+        \(ANSIColors.white.rawValue)⏳ Running \(echo)
+        Shusky is ready, please configure .shusky.yml
+        \(ANSIColors.green.rawValue)✔ \(echo) has successfully executed\n\n
+        """
         let hook = Hook(
-                hookType: .preCommit,
-                verbose: true,
-                commands: [Command(run: Run(
-                        command: "echo \"Shusky is ready, please configure .shusky.yml\"",
-                        verbose: true)
-                )])
+            hookType: .preCommit,
+            verbose: true,
+            commands: [Command(run: Run(
+                command: "echo \"Shusky is ready, please configure .shusky.yml\"",
+                verbose: true
+            )
+                )]
+        )
         let printerMock = PrinterMock()
         let commandHandler = HookHandler(hook: hook, shell: Shell(), printer: printerMock)
 
@@ -102,22 +125,22 @@ final class HookHandlerTests: XCTestCase {
         XCTAssertEqual(printerMock.output, consoleResult)
     }
 
-
     func testIfVerboseIsSetFalseAndCommandFailsDisplayResult() {
         let consoleResult = """
-                            \(ANSIColors.white.rawValue)⏳ Running \(echo)
-                            Shusky is ready, please configure .shusky.yml
-                            \(ANSIColors.red.rawValue)❌ \(echo) has failed with error 32\n\n
-                            """
+        \(ANSIColors.white.rawValue)⏳ Running \(echo)
+        Shusky is ready, please configure .shusky.yml
+        \(ANSIColors.red.rawValue)❌ \(echo) has failed with error 32\n\n
+        """
         let hook = Hook(
-                hookType: .preCommit,
-                verbose: false,
-                commands: [Command(run: Run(command: echo))])
+            hookType: .preCommit,
+            verbose: false,
+            commands: [Command(run: Run(command: echo))]
+        )
         let printerMock = PrinterMock()
         let commandHandler = HookHandler(
-                hook: hook,
-                shell: ShellMock(commandOutput: "Shusky is ready, please configure .shusky.yml", statusCode: 32),
-                printer: printerMock
+            hook: hook,
+            shell: ShellMock(commandOutput: "Shusky is ready, please configure .shusky.yml", statusCode: 32),
+            printer: printerMock
         )
         XCTAssertEqual(commandHandler.run(), 32)
         XCTAssertEqual(printerMock.output, consoleResult)
@@ -125,19 +148,20 @@ final class HookHandlerTests: XCTestCase {
 
     func testCommandFails() {
         let consoleResult = """
-                           \(ANSIColors.white.rawValue)⏳ Running \(echo)
-                           Shusky is ready, please configure .shusky.yml
-                           \(ANSIColors.red.rawValue)❌ \(echo) has failed with error 32\n\n
-                           """
+        \(ANSIColors.white.rawValue)⏳ Running \(echo)
+        Shusky is ready, please configure .shusky.yml
+        \(ANSIColors.red.rawValue)❌ \(echo) has failed with error 32\n\n
+        """
         let hook = Hook(
-                hookType: .preCommit,
-                verbose: true,
-                commands: [Command(run: Run(command: echo))])
+            hookType: .preCommit,
+            verbose: true,
+            commands: [Command(run: Run(command: echo))]
+        )
         let printerMock = PrinterMock()
         let commandHandler = HookHandler(
-                hook: hook,
-                shell: ShellMock(commandOutput: "Shusky is ready, please configure .shusky.yml", statusCode: 32),
-                printer: printerMock
+            hook: hook,
+            shell: ShellMock(commandOutput: "Shusky is ready, please configure .shusky.yml", statusCode: 32),
+            printer: printerMock
         )
         XCTAssertEqual(commandHandler.run(), 32)
         XCTAssertEqual(printerMock.output, consoleResult)
@@ -145,22 +169,24 @@ final class HookHandlerTests: XCTestCase {
 
     func testCommandFailsButIsDefinedAsNonCritical() {
         let consoleResult = """
-                            \(ANSIColors.white.rawValue)⏳ Running \(echo)
-                            Shusky is ready, please configure .shusky.yml
-                            \(ANSIColors.yellow.rawValue)⚠️ \(echo) has failed with error 32\n\n
-                            """
+        \(ANSIColors.white.rawValue)⏳ Running \(echo)
+        Shusky is ready, please configure .shusky.yml
+        \(ANSIColors.yellow.rawValue)⚠️ \(echo) has failed with error 32\n\n
+        """
         let hook = Hook(
-                hookType: .preCommit,
-                verbose: true,
-                commands: [Command(run: Run(
-                        command: "echo \"Shusky is ready, please configure .shusky.yml\"",
-                        critical: false)
-                )])
+            hookType: .preCommit,
+            verbose: true,
+            commands: [Command(run: Run(
+                command: "echo \"Shusky is ready, please configure .shusky.yml\"",
+                critical: false
+            )
+                )]
+        )
         let printerMock = PrinterMock()
         let commandHandler = HookHandler(
-                hook: hook,
-                shell: ShellMock(commandOutput: "Shusky is ready, please configure .shusky.yml", statusCode: 32),
-                printer: printerMock
+            hook: hook,
+            shell: ShellMock(commandOutput: "Shusky is ready, please configure .shusky.yml", statusCode: 32),
+            printer: printerMock
         )
 
         XCTAssertEqual(commandHandler.run(), 0)

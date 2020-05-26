@@ -1,11 +1,9 @@
-
-import Foundation
 import Files
-import XCTest
+import Foundation
 @testable import ShuskyCore
+import XCTest
 
 final class ShuskyFileTests: XCTestCase {
-
     let fileName = ".shusky.yml"
     let tmpFolder = Folder.temporary
     var testFolder: Folder!
@@ -15,7 +13,7 @@ final class ShuskyFileTests: XCTestCase {
         shuskyFile = ShuskyFile()
         // Setup a temp test folder that can be used as a sandbox
         testFolder = try! tmpFolder.createSubfolderIfNeeded(
-                withName: "ShuskyConfigFilesPath"
+            withName: "ShuskyConfigFilesPath"
         )
         // Empty the test folder to ensure a clean state
         try! testFolder.empty(includingHidden: true)
@@ -30,7 +28,7 @@ final class ShuskyFileTests: XCTestCase {
     }
 
     func testShuskyFileName() throws {
-        XCTAssertEqual(self.fileName, shuskyFile.fileName)
+        XCTAssertEqual(fileName, shuskyFile.fileName)
     }
 
     func testShuskyFilePath() throws {
@@ -46,17 +44,17 @@ final class ShuskyFileTests: XCTestCase {
 
     func testCreateFile() throws {
         try shuskyFile.create()
-        let file = try File(path: "./\(self.fileName)")
+        let file = try File(path: "./\(fileName)")
         XCTAssertNotNil(try? file.read())
     }
 
     func testCreateDefaultShuskyYamlFile() throws {
         try shuskyFile.createDefaultShuskyYaml()
-        let file = try File(path: "./\(self.fileName)")
+        let file = try File(path: "./\(fileName)")
         XCTAssertEqual(shuskyFile.defaultConfig, try! file.readAsString())
     }
 
-    func testDontCreateDefaultShuskyYamlFileIfNotEmpty() throws  {
+    func testDontCreateDefaultShuskyYamlFileIfNotEmpty() throws {
         let folder = try Folder(path: "./")
         let file = try folder.createFile(at: fileName)
         try file.write("Some data there")
@@ -68,13 +66,12 @@ final class ShuskyFileTests: XCTestCase {
     /// Returns path to the built products directory.
     var productsDirectory: URL {
         #if os(macOS)
-        for bundle in Bundle.allBundles where bundle.bundlePath.hasSuffix(".xctest") {
-            return bundle.bundleURL.deletingLastPathComponent()
-        }
-        fatalError("couldn't find the products directory")
+            for bundle in Bundle.allBundles where bundle.bundlePath.hasSuffix(".xctest") {
+                return bundle.bundleURL.deletingLastPathComponent()
+            }
+            fatalError("couldn't find the products directory")
         #else
-        return Bundle.main.bundleURL
+            return Bundle.main.bundleURL
         #endif
     }
-
 }
