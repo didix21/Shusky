@@ -34,14 +34,16 @@ final class GitHookFileHandlerTests: XCTestCase {
     }
 
     func testCreateHookFileIfNotExists() throws {
-        _ = try GitHookFileHandler(hook: .preCommit, path: path)
+        let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path)
+        try gitHookFileHandler.addHook()
         let file = try File(path: path + HookType.preCommit.rawValue)
         XCTAssertNotNil(try file.read())
     }
 
     func testAddHook() throws {
         let expectedContent = "swift run -c release shusky run pre-commit"
-        _ = try GitHookFileHandler(hook: .preCommit, path: path)
+        let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path)
+        try gitHookFileHandler.addHook()
         let file = try File(path: path + HookType.preCommit.rawValue)
         let actualContent = try file.readAsString()
         XCTAssertEqual(actualContent, expectedContent)
@@ -49,7 +51,8 @@ final class GitHookFileHandlerTests: XCTestCase {
 
     func testAddHookWithPackagePath() throws {
         let expectedContent = "swift run -c release --package-path BuildTools shusky run pre-commit"
-        _ = try GitHookFileHandler(hook: .preCommit, path: path, packagePath: "BuildTools")
+        let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path, packagePath: "BuildTools")
+        try gitHookFileHandler.addHook()
         let file = try File(path: path + HookType.preCommit.rawValue)
         let actualContent = try file.readAsString()
         XCTAssertEqual(actualContent, expectedContent)
@@ -62,7 +65,8 @@ final class GitHookFileHandlerTests: XCTestCase {
         try file.write(content)
 
         let expectedContent = content + "\nswift run -c release shusky run pre-commit\n"
-        _ = try GitHookFileHandler(hook: .preCommit, path: path)
+        let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path)
+        try gitHookFileHandler.addHook()
 
         let actualContent = try file.readAsString()
 
@@ -76,7 +80,8 @@ final class GitHookFileHandlerTests: XCTestCase {
         try file.write(content)
 
         let expectedContent = content + "\nswift run -c release --package-path BuildTools shusky run pre-commit\n"
-        _ = try GitHookFileHandler(hook: .preCommit, path: path, packagePath: "BuildTools")
+        let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path, packagePath: "BuildTools")
+        try gitHookFileHandler.addHook()
         let actualContent = try file.readAsString()
 
         XCTAssertEqual(actualContent, expectedContent)
@@ -88,7 +93,8 @@ final class GitHookFileHandlerTests: XCTestCase {
         let expectedContent = "swift run -c release shusky run pre-commit"
         try file.write(expectedContent)
 
-        _ = try GitHookFileHandler(hook: .preCommit, path: path)
+        let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path)
+        try gitHookFileHandler.addHook()
         let actualContent = try file.readAsString()
         XCTAssertEqual(actualContent, expectedContent)
     }
@@ -99,13 +105,15 @@ final class GitHookFileHandlerTests: XCTestCase {
         let expectedContent = "swift run -c release --package-path BuildTools shusky run pre-commit"
         try file.write(expectedContent)
 
-        _ = try GitHookFileHandler(hook: .preCommit, path: path, packagePath: "BuildTools")
+        let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path, packagePath: "BuildTools")
+        try gitHookFileHandler.addHook()
         let actualContent = try file.readAsString()
         XCTAssertEqual(actualContent, expectedContent)
     }
 
     func testExecutionPermissions() throws {
-        _ = try GitHookFileHandler(hook: .preCommit, path: path, packagePath: "BuildTools")
+        let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path, packagePath: "BuildTools")
+        try gitHookFileHandler.addHook()
         let fm = FileManager.default
         let attributes = try fm.attributesOfItem(atPath: path + HookType.preCommit.rawValue)
         XCTAssertEqual(attributes[.posixPermissions] as? Int, Optional(0o755))

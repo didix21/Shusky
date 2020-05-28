@@ -10,15 +10,14 @@ class GitHookFileHandler: Writable, Readable {
     private var hook: HookType
     private var packagePath: String?
 
-    public init(hook: HookType, path: String, packagePath: String? = nil) throws {
+    public init(hook: HookType, path: String, packagePath: String? = nil) {
         self.hook = hook
         fileName = hook.rawValue
         self.path = path
         self.packagePath = packagePath
-        try addHook()
     }
 
-    private func addHook() throws {
+    public func addHook() throws {
         if let content = try? read() {
             guard !content.contains(hookCommand()) else { return }
             try append("\n" + hookCommand() + "\n")
