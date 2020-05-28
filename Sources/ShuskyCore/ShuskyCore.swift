@@ -43,6 +43,7 @@ public final class ShuskyCore {
         do {
             try shuskyFile.createDefaultShuskyYaml()
             let hooksParser = try ShuskyHooksParser(try shuskyFile.read())
+
             for hookAvailable in hooksParser.availableHooks {
                 let gitHookFileHandler = GitHookFileHandler(
                     hook: hookAvailable,
@@ -50,6 +51,14 @@ public final class ShuskyCore {
                     packagePath: packagePath
                 )
                 try gitHookFileHandler.addHook()
+            }
+
+            for hookNotAvailable in HookType.getAll() where !hooksParser.availableHooks.contains(hookNotAvailable) {
+                let gitHookFileHandler = GitHookFileHandler(
+                    hook: hookNotAvailable,
+                    path: gitPath
+                )
+                try gitHookFileHandler.deleteHook()
             }
 
             return 0
@@ -68,7 +77,16 @@ public final class ShuskyCore {
         return commandHandler.run()
     }
 
-    public func uninstall() -> Int32 {
-        1
+    public func uninstall(gitPath: String) -> Int32 {
+        for hook in HookType.getAll() {
+            let gitHookFileHandler = GitHookFileHandler(hook: hook, path: gitPath)
+            do {
+                try gitHookFileHandler.deleteHook()
+            } catch {
+                return 1
+            }
+        }
+
+        return 0
     }
 }

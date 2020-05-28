@@ -9,6 +9,9 @@ class GitHookFileHandler: Writable, Readable {
     var path: String
     private var hook: HookType
     private var packagePath: String?
+    private static var swiftRun = "swift run -c release"
+    private static var swiftRunWithPath = "swift run -c release --package-path"
+    private static var shuskyRun = "shusky run"
 
     public init(hook: HookType, path: String, packagePath: String? = nil) {
         self.hook = hook
@@ -30,14 +33,16 @@ class GitHookFileHandler: Writable, Readable {
     }
 
     public func deleteHook() throws {
-        let content = try read()
+        guard let content = try? read() else {
+            return
+        }
         packagePath = getPackagePath(content)
-        if content.count == hookCommand().count{
+        if content.count == hookCommand().count {
             try delete()
             return
         }
         guard let startIndex = content.index(of: hookCommand()),
-              let endIndex = content.endIndex(of: hookCommand()) else {
+            let endIndex = content.endIndex(of: hookCommand()) else {
             return
         }
 
@@ -47,22 +52,22 @@ class GitHookFileHandler: Writable, Readable {
     }
 
     private func getPackagePath(_ content: String) -> String? {
-        guard let startIndex = content.endIndex(of: "swift run -c release --package-path "),
-            let endIndex = content.index(of: " shusky run \(hook.rawValue)\n") else {
+        guard let startIndex = content.endIndex(of: "\(Self.swiftRunWithPath) "),
+            let endIndex = content.index(of: " \(Self.shuskyRun) \(hook.rawValue)\n") else {
             return nil
         }
-        return String(content[startIndex...content.index(before: endIndex)])
+        return String(content[startIndex ... content.index(before: endIndex)])
     }
 
     private func hookCommand() -> String {
         guard let packagePath = packagePath else {
-            return "swift run -c release shusky run \(hook.rawValue)\n"
+            return "\(Self.swiftRun) \(Self.shuskyRun) \(hook.rawValue)\n"
         }
         return hookCommand(with: packagePath)
     }
 
     private func hookCommand(with packagePath: String) -> String {
-        "swift run -c release --package-path \(packagePath) shusky run \(hook.rawValue)\n"
+        "\(Self.swiftRunWithPath) \(packagePath) \(Self.shuskyRun) \(hook.rawValue)\n"
     }
 
     private func setUserExecutablePermissions() throws {
@@ -78,30 +83,33 @@ extension StringProtocol {
     func index<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> Index? {
         range(of: string, options: options)?.lowerBound
     }
+
     func endIndex<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> Index? {
         range(of: string, options: options)?.upperBound
     }
+
     func indices<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> [Index] {
         var indices: [Index] = []
         var startIndex = self.startIndex
         while startIndex < endIndex,
-              let range = self[startIndex...]
-                      .range(of: string, options: options) {
+            let range = self[startIndex...]
+            .range(of: string, options: options) {
             indices.append(range.lowerBound)
             startIndex = range.lowerBound < range.upperBound ? range.upperBound :
-                    index(range.lowerBound, offsetBy: 1, limitedBy: endIndex) ?? endIndex
+                index(range.lowerBound, offsetBy: 1, limitedBy: endIndex) ?? endIndex
         }
         return indices
     }
+
     func ranges<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> [Range<Index>] {
         var result: [Range<Index>] = []
         var startIndex = self.startIndex
         while startIndex < endIndex,
-              let range = self[startIndex...]
-                      .range(of: string, options: options) {
+            let range = self[startIndex...]
+            .range(of: string, options: options) {
             result.append(range)
             startIndex = range.lowerBound < range.upperBound ? range.upperBound :
-                    index(range.lowerBound, offsetBy: 1, limitedBy: endIndex) ?? endIndex
+                index(range.lowerBound, offsetBy: 1, limitedBy: endIndex) ?? endIndex
         }
         return result
     }
