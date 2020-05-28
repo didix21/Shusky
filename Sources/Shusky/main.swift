@@ -2,10 +2,8 @@ import Foundation
 import ShuskyCore
 import Yams
 
-let fileManager = FileManager.default
-fileManager.changeCurrentDirectoryPath("/Users/didaccoll/repos/Shusky")
-// let shuskyCore = ShuskyCore()
-// shuskyCore.run(hookType: .preCommit)
+// let fileManager = FileManager.default
+// fileManager.changeCurrentDirectoryPath("/Users/didaccoll/repos/Shusky")
 
 import ArgumentParser
 
@@ -29,12 +27,8 @@ struct Shusky: ParsableCommand {
         var packagePath: String?
 
         func run() throws {
-            let shell = Shell()
-            let result = shell.execute("git rev-parse --git-common-dir")
-            let end = result.output.endIndex
-            let git = String(result.output[..<result.output.index(before: end)])
             let shuskyCore = ShuskyCore()
-            if shuskyCore.install(gitPath: "\(git)/hooks/", packagePath: packagePath) != 0 {
+            if shuskyCore.install(gitPath: Shusky.getGitHookPath(), packagePath: packagePath) != 0 {
                 throw ShuskyError.installFailed
             }
         }
@@ -71,10 +65,18 @@ struct Shusky: ParsableCommand {
 
         func run() throws {
             let shuskyCore = ShuskyCore()
-            if shuskyCore.uninstall() != 0 {
+            if shuskyCore.uninstall(gitPath: Shusky.getGitHookPath()) != 0 {
                 throw ShuskyError.uninstallFailed
             }
         }
+    }
+
+    private static func getGitHookPath() -> String {
+        let shell = Shell()
+        let result = shell.execute("git rev-parse --git-common-dir")
+        let end = result.output.endIndex
+        let git = String(result.output[..<result.output.index(before: end)])
+        return "\(git)/hooks/"
     }
 }
 

@@ -21,6 +21,7 @@ public protocol Writable: Nameable {
     func create() throws
     func write(_ string: String) throws
     func append(_ string: String) throws
+    func delete() throws
 }
 
 extension Writable {
@@ -37,6 +38,11 @@ extension Writable {
     func append(_ string: String) throws {
         let file = try File(path: path + fileName)
         try file.append(string)
+    }
+
+    func delete() throws {
+        let file = try File(path: path + fileName)
+        try file.delete()
     }
 }
 

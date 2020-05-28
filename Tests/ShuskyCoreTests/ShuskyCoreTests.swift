@@ -11,7 +11,11 @@ final class ShuskyCoreTests: XCTestCase {
     var testFolder: Folder!
 
     func swiftRun(hookType: String) -> String {
-        "swift run -c release shusky run \(hookType)"
+        "swift run -c release shusky run \(hookType)\n"
+    }
+
+    func swiftRunWithPath(hookType: String, packagePath: String = "Complex/Path/To/Execute/Swift/Package") -> String {
+        "swift run -c release --package-path \(packagePath) shusky run \(hookType)\n"
     }
 
     override func setUp() {
@@ -36,7 +40,7 @@ final class ShuskyCoreTests: XCTestCase {
 
     func testDefaultContentOfShuskyYMlAndPreCommitConfigured() throws {
         let shuskyCore = ShuskyCore()
-        shuskyCore.install(gitPath: gitPath)
+        let result = shuskyCore.install(gitPath: gitPath)
         let shuskyFile = try File(path: shuskyFileName)
         let preCommitFile = try File(path: "\(gitPath)pre-commit")
 
@@ -48,10 +52,11 @@ final class ShuskyCoreTests: XCTestCase {
 
             """
         )
-        XCTAssertEqual(try preCommitFile.readAsString(), "swift run -c release shusky run pre-commit")
+        XCTAssertEqual(try preCommitFile.readAsString(), "swift run -c release shusky run pre-commit\n")
+        XCTAssertEqual(result, 0)
     }
 
-    func testAddMultipleHooksIfTheyAreConfigured() throws {
+    func testInstallAddMultipleHooksIfTheyAreConfigured() throws {
         let config = """
         applypatch-msg:
            - echo print something
@@ -63,7 +68,7 @@ final class ShuskyCoreTests: XCTestCase {
         let file = try testFolder.createFile(named: shuskyFileName)
         try file.write(config)
         let shuskyCore = ShuskyCore()
-        shuskyCore.install(gitPath: gitPath)
+        let result = shuskyCore.install(gitPath: gitPath)
         let applyPatchMsgFile = try File(path: "\(gitPath)applypatch-msg")
         let prePushFile = try File(path: "\(gitPath)pre-push")
         let preCommit = try File(path: "\(gitPath)pre-commit")
@@ -71,6 +76,40 @@ final class ShuskyCoreTests: XCTestCase {
         XCTAssertEqual(try applyPatchMsgFile.readAsString(), swiftRun(hookType: "applypatch-msg"))
         XCTAssertEqual(try prePushFile.readAsString(), swiftRun(hookType: "pre-push"))
         XCTAssertEqual(try preCommit.readAsString(), swiftRun(hookType: "pre-commit"))
+        XCTAssertEqual(result, 0)
+    }
+
+    func testInstallMustRemoveThoseHooksThatAreNoLongerPresentInShuskyYml() throws {
+        let config = """
+        applypatch-msg:
+           - echo print something
+        pre-push:
+           - echo print something
+        pre-commit:
+           - echo print something
+        """
+        let file = try testFolder.createFile(named: shuskyFileName)
+        try file.write(config)
+
+        for hook in HookType.getAll() {
+            let file = try testFolder.createFile(at: gitPath + hook.rawValue)
+            try file.write(swiftRunWithPath(hookType: hook.rawValue))
+        }
+
+        let shuskyCore = ShuskyCore()
+        let result = shuskyCore.install(gitPath: gitPath)
+
+        let expectedHooksInstalled: [HookType] = [.applypatchMsg, .prePush, .preCommit]
+
+        for hook in HookType.getAll() where !expectedHooksInstalled.contains(hook) {
+            XCTAssertNil(try? File(path: gitPath + hook.rawValue))
+        }
+
+        for expectedHook in expectedHooksInstalled {
+            XCTAssertNotNil(try? File(path: gitPath + expectedHook.rawValue))
+        }
+
+        XCTAssertEqual(result, 0)
     }
 
     func testRunReturn1IfShuskyFileDoesNotExist() throws {
@@ -137,5 +176,46 @@ final class ShuskyCoreTests: XCTestCase {
         let exitCode = shuskyCore.run(hookType: .prePush)
 
         XCTAssertEqual(exitCode, 0)
+    }
+
+    func testRunUninstall() throws {
+        for hook in HookType.getAll() {
+            let file = try testFolder.createFile(at: gitPath + hook.rawValue)
+            try file.write(swiftRun(hookType: hook.rawValue))
+        }
+
+        let shuskyCore = ShuskyCore()
+        let result = shuskyCore.uninstall(gitPath: gitPath)
+
+        for hook in HookType.getAll() {
+            XCTAssertNil(try? File(path: gitPath + hook.rawValue))
+        }
+
+        XCTAssertEqual(result, 0)
+    }
+
+    func testRunUninstallWithPackagePath() throws {
+        for hook in HookType.getAll() {
+            let file = try testFolder.createFile(at: gitPath + hook.rawValue)
+            try file.write(swiftRunWithPath(hookType: hook.rawValue))
+        }
+
+        let shuskyCore = ShuskyCore()
+        let result = shuskyCore.uninstall(gitPath: gitPath)
+
+        for hook in HookType.getAll() {
+            XCTAssertNil(try? File(path: gitPath + hook.rawValue))
+        }
+
+        XCTAssertEqual(result, 0)
+    }
+
+    func testRunUninstallDoesNotFailIfNotContainsShuskyRunCommand() throws {
+        let file = try testFolder.createFile(at: gitPath + HookType.preCommit.rawValue)
+        try file.write("write any command here")
+        let shuskyCore = ShuskyCore()
+        let result = shuskyCore.uninstall(gitPath: gitPath)
+
+        XCTAssertEqual(result, 0)
     }
 }

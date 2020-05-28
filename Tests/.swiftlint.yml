@@ -2,11 +2,11 @@ disabled_rules:
   - trailing_comma
   - force_try
   - force_cast
+  - identifier_name
 excluded: # paths to ignore during linting. Takes precedence over `included`.
   - .build
   - BuildTools/.build
   - .idea
-  - XCTestManifests.swift
 line_length:
   warning: 200
   ignores_comments: true

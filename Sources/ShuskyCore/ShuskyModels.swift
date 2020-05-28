@@ -26,7 +26,7 @@ public enum HookType: String {
     static func getAll() -> [HookType] {
         [
             .applypatchMsg,
-            preApplyPatch,
+            .preApplyPatch,
             .postApplyPatch,
             .preCommit,
             .preMergeCommit,

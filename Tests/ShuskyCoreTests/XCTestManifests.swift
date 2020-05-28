@@ -11,6 +11,25 @@
             ("testAppendHook", testAppendHook),
             ("testAppendHookWithPackagePath", testAppendHookWithPackagePath),
             ("testCreateHookFileIfNotExists", testCreateHookFileIfNotExists),
+            ("testDeleteHookFileMustBeDeleted", testDeleteHookFileMustBeDeleted),
+            ("testDeleteHookFileMustBeDeletedWithPackagePath", testDeleteHookFileMustBeDeletedWithPackagePath),
+            (
+                "testDeleteHookFileMustNotBeDeletedWhenContainsOtherDataCase1",
+                testDeleteHookFileMustNotBeDeletedWhenContainsOtherDataCase1
+            ),
+            (
+                "testDeleteHookFileMustNotBeDeletedWhenContainsOtherDataCase2",
+                testDeleteHookFileMustNotBeDeletedWhenContainsOtherDataCase2
+            ),
+            (
+                "testDeleteHookFileMustNotBeDeletedWhenContainsOtherDataCase3",
+                testDeleteHookFileMustNotBeDeletedWhenContainsOtherDataCase3
+            ),
+            (
+                "testDeleteHookFileMustNotBeDeletedWhenContainsOtherDataCase4",
+                testDeleteHookFileMustNotBeDeletedWhenContainsOtherDataCase4
+            ),
+            ("testDeleteHookIfThereIsNoShuskyRun", testDeleteHookIfThereIsNoShuskyRun),
             ("testDontAppendHookIfAlreadyExist", testDontAppendHookIfAlreadyExist),
             ("testDontAppendHookWithPackagePathIfAlreadyExist", testDontAppendHookWithPackagePathIfAlreadyExist),
             ("testExecutionPermissions", testExecutionPermissions),
