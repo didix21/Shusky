@@ -44,7 +44,11 @@ public final class ShuskyCore {
             try shuskyFile.createDefaultShuskyYaml()
             let hooksParser = try ShuskyHooksParser(try shuskyFile.read())
             for hookAvailable in hooksParser.availableHooks {
-                let gitHookFileHandler = GitHookFileHandler(hook: hookAvailable, path: gitPath, packagePath: packagePath)
+                let gitHookFileHandler = GitHookFileHandler(
+                    hook: hookAvailable,
+                    path: gitPath,
+                    packagePath: packagePath
+                )
                 try gitHookFileHandler.addHook()
             }
 

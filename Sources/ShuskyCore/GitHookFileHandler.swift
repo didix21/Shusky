@@ -20,7 +20,7 @@ class GitHookFileHandler: Writable, Readable {
     public func addHook() throws {
         if let content = try? read() {
             guard !content.contains(hookCommand()) else { return }
-            try append("\n" + hookCommand() + "\n")
+            try append("\n" + hookCommand())
             try setUserExecutablePermissions()
             return
         }
@@ -29,15 +29,40 @@ class GitHookFileHandler: Writable, Readable {
         try setUserExecutablePermissions()
     }
 
+    public func deleteHook() throws {
+        let content = try read()
+        packagePath = getPackagePath(content)
+        if content.count == hookCommand().count{
+            try delete()
+            return
+        }
+        guard let startIndex = content.index(of: hookCommand()),
+              let endIndex = content.endIndex(of: hookCommand()) else {
+            return
+        }
+
+        let deletedHook = String(content[..<startIndex] + content[endIndex...])
+
+        try write(deletedHook)
+    }
+
+    private func getPackagePath(_ content: String) -> String? {
+        guard let startIndex = content.endIndex(of: "swift run -c release --package-path "),
+            let endIndex = content.index(of: " shusky run \(hook.rawValue)\n") else {
+            return nil
+        }
+        return String(content[startIndex...content.index(before: endIndex)])
+    }
+
     private func hookCommand() -> String {
         guard let packagePath = packagePath else {
-            return "swift run -c release shusky run \(hook.rawValue)"
+            return "swift run -c release shusky run \(hook.rawValue)\n"
         }
         return hookCommand(with: packagePath)
     }
 
     private func hookCommand(with packagePath: String) -> String {
-        "swift run -c release --package-path \(packagePath) shusky run \(hook.rawValue)"
+        "swift run -c release --package-path \(packagePath) shusky run \(hook.rawValue)\n"
     }
 
     private func setUserExecutablePermissions() throws {
@@ -46,5 +71,38 @@ class GitHookFileHandler: Writable, Readable {
             .posixPermissions: 0o755,
         ]
         try fm.setAttributes(attributes, ofItemAtPath: path + fileName)
+    }
+}
+
+extension StringProtocol {
+    func index<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> Index? {
+        range(of: string, options: options)?.lowerBound
+    }
+    func endIndex<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> Index? {
+        range(of: string, options: options)?.upperBound
+    }
+    func indices<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> [Index] {
+        var indices: [Index] = []
+        var startIndex = self.startIndex
+        while startIndex < endIndex,
+              let range = self[startIndex...]
+                      .range(of: string, options: options) {
+            indices.append(range.lowerBound)
+            startIndex = range.lowerBound < range.upperBound ? range.upperBound :
+                    index(range.lowerBound, offsetBy: 1, limitedBy: endIndex) ?? endIndex
+        }
+        return indices
+    }
+    func ranges<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> [Range<Index>] {
+        var result: [Range<Index>] = []
+        var startIndex = self.startIndex
+        while startIndex < endIndex,
+              let range = self[startIndex...]
+                      .range(of: string, options: options) {
+            result.append(range)
+            startIndex = range.lowerBound < range.upperBound ? range.upperBound :
+                    index(range.lowerBound, offsetBy: 1, limitedBy: endIndex) ?? endIndex
+        }
+        return result
     }
 }

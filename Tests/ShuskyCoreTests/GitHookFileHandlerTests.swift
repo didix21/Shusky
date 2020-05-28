@@ -41,7 +41,7 @@ final class GitHookFileHandlerTests: XCTestCase {
     }
 
     func testAddHook() throws {
-        let expectedContent = "swift run -c release shusky run pre-commit"
+        let expectedContent = "swift run -c release shusky run pre-commit\n"
         let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path)
         try gitHookFileHandler.addHook()
         let file = try File(path: path + HookType.preCommit.rawValue)
@@ -50,7 +50,7 @@ final class GitHookFileHandlerTests: XCTestCase {
     }
 
     func testAddHookWithPackagePath() throws {
-        let expectedContent = "swift run -c release --package-path BuildTools shusky run pre-commit"
+        let expectedContent = "swift run -c release --package-path BuildTools shusky run pre-commit\n"
         let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path, packagePath: "BuildTools")
         try gitHookFileHandler.addHook()
         let file = try File(path: path + HookType.preCommit.rawValue)
@@ -90,7 +90,7 @@ final class GitHookFileHandlerTests: XCTestCase {
     func testDontAppendHookIfAlreadyExist() throws {
         let folder = try Folder(path: path)
         let file = try folder.createFileIfNeeded(at: HookType.preCommit.rawValue)
-        let expectedContent = "swift run -c release shusky run pre-commit"
+        let expectedContent = "swift run -c release shusky run pre-commit\n"
         try file.write(expectedContent)
 
         let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path)
@@ -102,7 +102,7 @@ final class GitHookFileHandlerTests: XCTestCase {
     func testDontAppendHookWithPackagePathIfAlreadyExist() throws {
         let folder = try Folder(path: path)
         let file = try folder.createFileIfNeeded(at: HookType.preCommit.rawValue)
-        let expectedContent = "swift run -c release --package-path BuildTools shusky run pre-commit"
+        let expectedContent = "swift run -c release --package-path BuildTools shusky run pre-commit\n"
         try file.write(expectedContent)
 
         let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path, packagePath: "BuildTools")
@@ -118,6 +118,97 @@ final class GitHookFileHandlerTests: XCTestCase {
         let attributes = try fm.attributesOfItem(atPath: path + HookType.preCommit.rawValue)
         XCTAssertEqual(attributes[.posixPermissions] as? Int, Optional(0o755))
     }
+
+    func testDeleteHookFileMustBeDeleted() throws {
+        let file = try testFolder.createFile(at: path + HookType.preCommit.rawValue)
+        let content = "swift run -c release shusky run pre-commit\n"
+        try file.write(content)
+        let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path)
+        try gitHookFileHandler.deleteHook()
+
+        XCTAssertNil(try? file.readAsString())
+    }
+
+    func testDeleteHookFileMustNotBeDeletedWhenContainsOtherDataCase1() throws {
+        let file = try testFolder.createFile(at: path + HookType.preCommit.rawValue)
+        let expectedContent = """
+                      git add -A
+                      git commit -m "New Commit"\n
+                      """
+        let content = expectedContent + "swift run -c release shusky run pre-commit\n"
+        try file.write(content)
+        let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path)
+        try gitHookFileHandler.deleteHook()
+
+        XCTAssertEqual(try file.readAsString(), expectedContent)
+    }
+
+    func testDeleteHookFileMustNotBeDeletedWhenContainsOtherDataCase2() throws {
+        let file = try testFolder.createFile(at: path + HookType.preCommit.rawValue)
+        let expectedContent = """
+                              git add -A
+                              git commit -m "New Commit"\n
+                              """
+        let content = "swift run -c release shusky run pre-commit\n" + expectedContent
+        try file.write(content)
+        let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path)
+        try gitHookFileHandler.deleteHook()
+
+        XCTAssertEqual(try file.readAsString(), expectedContent)
+    }
+
+    func testDeleteHookFileMustNotBeDeletedWhenContainsOtherDataCase3() throws {
+        let file = try testFolder.createFile(at: path + HookType.preCommit.rawValue)
+        let expectedContent = """
+                              git add -A
+                              git commit -m "New Commit"\n
+                              """
+        let content = "git something\n" + "swift run -c release shusky run pre-commit\n" + expectedContent
+        try file.write(content)
+        let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path)
+        try gitHookFileHandler.deleteHook()
+
+        XCTAssertEqual(try file.readAsString(), "git something\n" + expectedContent)
+    }
+
+    func testDeleteHookFileMustBeDeletedWithPackagePath() throws {
+        let file = try testFolder.createFile(at: path + HookType.preCommit.rawValue)
+        let content = "swift run -c release --package-path BuildTools shusky run pre-commit\n"
+        try file.write(content)
+        let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path)
+        try gitHookFileHandler.deleteHook()
+
+        XCTAssertNil(try? file.readAsString())
+    }
+
+    func testDeleteHookFileMustNotBeDeletedWhenContainsOtherDataCase4() throws {
+        let file = try testFolder.createFile(at: path + HookType.preCommit.rawValue)
+        let expectedContent = """
+                              git add -A
+                              git commit -m "New Commit"\n
+                              """
+        let content = "git something\n" + "swift run -c release --package-path BuildTools shusky run pre-commit\n" 
+                + expectedContent
+        try file.write(content)
+        let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path)
+        try gitHookFileHandler.deleteHook()
+
+        XCTAssertEqual(try file.readAsString(), "git something\n" + expectedContent)
+    }
+
+    func testDeleteHookIfThereIsNoShuskyRun() throws {
+        let file = try testFolder.createFile(at: path + HookType.preCommit.rawValue)
+        let expectedContent = """
+                              git add -A
+                              git commit -m "New Commit"\n
+                              """
+        try file.write(expectedContent)
+        let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path)
+        try gitHookFileHandler.deleteHook()
+
+        XCTAssertEqual(try file.readAsString(), expectedContent)
+    }
+
 
     // Returns path to the built products directory.
     var productsDirectory: URL {
