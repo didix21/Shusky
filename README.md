@@ -38,7 +38,7 @@ git hooks with Swift. Can prevent `git commit` and `git push`.
 Add the following code to your `Package.swift` file.
 
 ```Swift
-    .package("https://github.com/didix21/Shusky", from: "0.1.0")
+.package(url: "https://github.com/didix21/Shusky", from: "0.1.0")
 ```
 
 Then:

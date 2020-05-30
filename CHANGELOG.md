@@ -11,7 +11,9 @@
 - Implement shell [\#17](https://github.com/didix21/Shusky/issues/17)
 - Implement ShuskyCore [\#14](https://github.com/didix21/Shusky/issues/14)
 - Implement shusky command line [\#13](https://github.com/didix21/Shusky/issues/13)
+- Yaml error handling [\#9](https://github.com/didix21/Shusky/issues/9)
 - Create the documentation [\#7](https://github.com/didix21/Shusky/issues/7)
+- Add CI [\#6](https://github.com/didix21/Shusky/issues/6)
 - Add shusky to the corresponding git hook [\#5](https://github.com/didix21/Shusky/issues/5)
 - Read a yaml file [\#4](https://github.com/didix21/Shusky/issues/4)
 - Add the following icons for show in console [\#3](https://github.com/didix21/Shusky/issues/3)
@@ -20,10 +22,20 @@
 - Add README.md \#7 [\#24](https://github.com/didix21/Shusky/pull/24) ([didix21](https://github.com/didix21))
 - Add SwiftFormat and SwiftLint \#21 [\#22](https://github.com/didix21/Shusky/pull/22) ([didix21](https://github.com/didix21))
 - Implement shusky command line \#13 [\#20](https://github.com/didix21/Shusky/pull/20) ([didix21](https://github.com/didix21))
+- Add new features to ShuskyCore \#2, \#3, \#17 [\#18](https://github.com/didix21/Shusky/pull/18) ([didix21](https://github.com/didix21))
 - Implement ShuskyCore \#14 [\#16](https://github.com/didix21/Shusky/pull/16) ([didix21](https://github.com/didix21))
 - Add shusky to the corresponding git hook \#5 [\#12](https://github.com/didix21/Shusky/pull/12) ([didix21](https://github.com/didix21))
 - Create Shusky Models \#1 [\#11](https://github.com/didix21/Shusky/pull/11) ([didix21](https://github.com/didix21))
 - Read yaml file \#4 [\#10](https://github.com/didix21/Shusky/pull/10) ([didix21](https://github.com/didix21))
+
+**Closed issues:**
+
+- Add CHANGELOG [\#8](https://github.com/didix21/Shusky/issues/8)
+
+**Merged pull requests:**
+
+- Add travis config \#6 [\#26](https://github.com/didix21/Shusky/pull/26) ([didix21](https://github.com/didix21))
+- Add Changelog \#8 [\#25](https://github.com/didix21/Shusky/pull/25) ([didix21](https://github.com/didix21))
 
 
 

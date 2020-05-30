@@ -48,9 +48,9 @@ final class ShuskyCoreTests: XCTestCase {
             try shuskyFile.readAsString(),
             """
             pre-push:
-                - echo "Shusky is ready, please configure \(shuskyFileName).
+                - echo "Shusky is ready, please configure \(shuskyFileName)"
             pre-commit:
-                - echo "Shusky is ready, please configure \(shuskyFileName).
+                - echo "Shusky is ready, please configure \(shuskyFileName)"
 
             """
         )
