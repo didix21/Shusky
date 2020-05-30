@@ -70,16 +70,26 @@
         //   `swift test --generate-linuxmain`
         // to regenerate.
         static let __allTests__ShuskyCoreTests = [
-            ("testAddMultipleHooksIfTheyAreConfigured", testAddMultipleHooksIfTheyAreConfigured),
             (
                 "testDefaultContentOfShuskyYMlAndPreCommitConfigured",
                 testDefaultContentOfShuskyYMlAndPreCommitConfigured
+            ),
+            ("testInstallAddMultipleHooksIfTheyAreConfigured", testInstallAddMultipleHooksIfTheyAreConfigured),
+            (
+                "testInstallMustRemoveThoseHooksThatAreNoLongerPresentInShuskyYml",
+                testInstallMustRemoveThoseHooksThatAreNoLongerPresentInShuskyYml
             ),
             ("testRunReturn0IfAllCommandsAreExecuted", testRunReturn0IfAllCommandsAreExecuted),
             ("testRunReturn1IfHookIsEmpty", testRunReturn1IfHookIsEmpty),
             ("testRunReturn1IfShuskyFileDoesNotExist", testRunReturn1IfShuskyFileDoesNotExist),
             ("testRunReturns0IfHookIsNotDefined", testRunReturns0IfHookIsNotDefined),
             ("testRunReturnTheCodeErrorOfCommandThatHasFailed", testRunReturnTheCodeErrorOfCommandThatHasFailed),
+            ("testRunUninstall", testRunUninstall),
+            (
+                "testRunUninstallDoesNotFailIfNotContainsShuskyRunCommand",
+                testRunUninstallDoesNotFailIfNotContainsShuskyRunCommand
+            ),
+            ("testRunUninstallWithPackagePath", testRunUninstallWithPackagePath),
         ]
     }
 
