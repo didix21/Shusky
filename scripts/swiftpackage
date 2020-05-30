@@ -1,0 +1,117 @@
+#!/usr/local/bin/python3
+import json
+import os
+import getopt, sys
+
+# Welcome to swiftpackage script. This script is in charge of checking if Swift Package.resolved file
+# has changed. If so, then will compile and then execute swift run. If not, it will run the binary.
+# How to use: ./swiftpackage -c "swiftlint --strict KidsApp/"
+
+CI_PACKAGE_RESOLVED = './BuildTools/.TravisCIPackageResolved'
+SWIFT_PACKAGE_RESOLVED = './BuildTools/Package.resolved'
+BINARIES_PATH= './BuildTools/.build/release/'
+
+def run_binary(command: str):
+    os.system(BINARIES_PATH + command)
+
+def swift_run(command: str):
+    os.system(f'swift run -c release --package-path BuildTools {command}')
+
+def get_json_content(file_name: str) -> dict:
+    content: dict = {}
+    with open(file_name, 'r', encoding='utf-8') as file:
+        content = json.load(file)
+
+    return content
+
+def get_commit_command_from_package_resolved(command: str, package_resolved: dict) -> str:
+    for pin in package_resolved['object']['pins']:
+        if command.lower() == pin['package'].lower():
+            return pin['state']['revision']
+
+    return ''
+
+def create_json(file_name: str, content: dict):
+    with open(file_name, 'w', encoding='utf-8') as file:
+        json.dump(content, file)
+
+def get_command_name(command: str) -> str:
+    parameters = command.split(' ')
+    if len(parameters) > 1:
+        return command.split(' ')[0]
+
+    return command
+
+def handle_ciecle_ci_package_resolved(file_name: str, command: str, commit: str):
+    command_name = get_command_name(command)
+
+    if os.path.exists(file_name):
+        pins = get_json_content(file_name)
+
+        for pin in pins:
+            if pin == command_name:
+                old_commit = pins[command_name]
+                if old_commit == commit:
+                    if os.path.exists(BINARIES_PATH + command_name):
+                        print("Commit has not changed, execute the binary")
+                        run_binary(command)
+                        return
+
+                    print("Binary not found, execute swift run")
+                    swift_run(command)
+                    return
+
+                print("Commit has changed, execute swift run")
+                pins[command_name] = commit
+                create_json(file_name, pins)
+                swift_run(command)
+                return
+
+        print(f"Command not found in {CI_PACKAGE_RESOLVED}, execute swift run")
+        pins.update({command_name: commit})
+        create_json(file_name, pins)
+        swift_run(command)
+        return
+
+    print(f"File {CI_PACKAGE_RESOLVED} does not exist, execute swift run")
+    create_json(file_name, {command_name: commit})
+    swift_run(command)
+
+
+def get_command() -> str:
+    command: str = ''
+    try:
+        opts, _ = getopt.getopt(sys.argv[1:], "c:", ["command"])
+    except getopt.GetoptError as err:
+        print(err)
+
+    for opt, arg in opts:
+        if opt == '-c':
+            command = arg
+        else:
+            assert False, "Unhandled option"
+
+    return command
+
+def main():
+    command = get_command()
+    command_name = get_command_name(command)
+    if command and command_name:
+        try:
+            package_resolved = get_json_content(SWIFT_PACKAGE_RESOLVED)
+
+            if package_resolved:
+                commit = get_commit_command_from_package_resolved(command_name, package_resolved)
+                handle_ciecle_ci_package_resolved(CI_PACKAGE_RESOLVED, command, commit)
+
+        except:
+            print("Unexpected error:", sys.exc_info()[0])
+            raise
+
+        return
+
+    print("Error no commands defined")
+
+
+if __name__ == "__main__":
+    main()
