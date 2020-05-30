@@ -1,4 +1,4 @@
 pre-commit:
     - swift run -c release --package-path BuildTools swiftformat .
     - swift run -c release --package-path BuildTools swiftlint lint .
-    - set -o pipefail && swift test 2>&1 | xcpretty --color
+    - set -o pipefail && swift test 2>&1 | bundle exec xcpretty --color

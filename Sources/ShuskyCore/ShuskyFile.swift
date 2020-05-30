@@ -52,8 +52,10 @@ class ShuskyFile: Readable, Writable {
 
     public var defaultConfig: String {
         """
+        pre-push:
+            - echo "Shusky is ready, please configure \(fileName).
         pre-commit:
-            - echo "Shusky is ready, please configure \(fileName)
+            - echo "Shusky is ready, please configure \(fileName).
 
         """
     }
