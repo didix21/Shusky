@@ -1,50 +1,3 @@
-
-Skip to content
-Pull requests
-Issues
-Marketplace
-Explore
-@didix21
-didix21 /
-mdutils
-
-46
-3
-18
-
-    5
-
-Code
-Issues 2
-Pull requests 1
-Actions
-Projects 0
-Wiki
-Security 0
-Insights
-
-    Settings
-
-Create CODE_OF_CONDUCT.md #34
-Open
-didix21 wants to merge 1 commit into master from add-code-of-conduct-1
-+76 −0
-Conversation 0 Commits 1 Checks 0
-Files changed 1
-Open
-Create CODE_OF_CONDUCT.md
-#34
-File filter...
-
-Create CODE_OF_CONDUCT.md
-
-    add-code-of-conduct-1 (#34) 
-
-@didix21
-didix21 committed 2 minutes ago
-commit 9c21d5fcc74acca5504ebe50566294d71c1d8105
-76 CODE_OF_CONDUCT.md
-@@ -0,0 +1,76 @@
 # Contributor Covenant Code of Conduct
 
 ## Our Pledge
@@ -121,19 +74,3 @@ available at https://www.contributor-covenant.org/version/1/4/code-of-conduct.ht
 
 For answers to common questions about this code of conduct, see
 https://www.contributor-covenant.org/faq
-ProTip! Use n and p to navigate between commits in a pull request.
-
-    © 2020 GitHub, Inc.
-    Terms
-    Privacy
-    Security
-    Status
-    Help
-
-    Contact GitHub
-    Pricing
-    API
-    Training
-    Blog
-    About
-
