@@ -83,6 +83,7 @@ final class HookHandler {
     }
 
     public func run() -> Int32 {
+        guard !isSkipEnabled() else { return 0 }
         for command in hook.commands {
             printer.printState(.running, command)
             let result = getResult(command: command)
@@ -150,6 +151,17 @@ final class HookHandler {
         shell.execute(command.run.command)
     }
 
+    private func isSkipEnabled() -> Bool {
+        if getEnv(.skipShusky) != nil {
+            return true
+        }
+        return false
+    }
+
+    private func getEnv(_ param: ShuskyEnv) -> UnsafeMutablePointer<Int8>! {
+        getenv(param.rawValue)
+    }
+
     enum CommandState {
         case running
         case success
@@ -168,5 +180,9 @@ final class HookHandler {
                 return "⚠️ \(command) has failed with error \(errorCode)\n"
             }
         }
+    }
+
+    enum ShuskyEnv: String {
+        case skipShusky = "SKIP_SHUSKY"
     }
 }
