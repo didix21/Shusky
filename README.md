@@ -37,7 +37,7 @@ git hooks with Swift. Can prevent `git commit` and `git push`.
 
 Add the following code to your `Package.swift` file.
 
-```Swift
+```swift
 .package(url: "https://github.com/didix21/Shusky", from: "0.1.0")
 ```
 
@@ -54,11 +54,11 @@ Then:
 
 This will add a new file `.shusky.yml` in your root with the following configuration:
 
-```
+```yaml
 pre-push:
-    - echo "Shusky is ready, please configure .shusky.yml.
+    - echo "Shusky is ready, please configure .shusky.yml"
 pre-commit:
-    - echo "Shusky is ready, please configure .shusky.yml.
+    - echo "Shusky is ready, please configure .shusky.yml"
 
 ```
 
@@ -67,18 +67,18 @@ it only will add the command for running shusky. More info in [Advanced installa
 
 ## How to use
 
- - Only need to add your commands in `.shusky.yml` configuration file. For example:
-``` Yaml
-pre-push:
-    - set -o pipefail && swift test 2>&1 | xcpretty --color
-pre-commit:
-    - swift run -c release swiftformat .
-    - swift run -c release swiftlint lint .
-    - git add -A
-```
+- Only need to add your commands in `.shusky.yml` configuration file. For example:
+    ```yaml
+    pre-push:
+        - set -o pipefail && swift test 2>&1 | xcpretty --color
+    pre-commit:
+        - swift run -c release swiftformat .
+        - swift run -c release swiftlint lint .
+        - git add -A
+    ```
 
 - **If you add a new hook you must run again** `shusky install`. For example:
-    ``` Yaml
+    ```yaml
     pre-push:
         - set -o pipefail && swift test 2>&1 | xcpretty --color
     pre-commit:
@@ -90,7 +90,7 @@ pre-commit:
     ```
 
 - You can add especial behaviour to commands using the key `run`. For example you can set non-verbose to commands. Then only wil display output result only if the command fails. For example:
-    ``` Yaml
+    ```yaml
     pre-commit:
         - swift run -c release swiftformat .
         - swift run -c release swiftlint lint .
@@ -102,8 +102,7 @@ pre-commit:
 
 -  Maybe while you're developing you don't want to cancel the `git commit` if one of the commands fail. So you can set propierty `critical` to `false`.
 In this example, if `swiftlint` fails will keep going with the commit:
-
-    ``` Yaml
+    ```yaml
     pre-commit:
         - swift run -c release swiftformat .
         - run:
@@ -119,6 +118,6 @@ In this example, if `swiftlint` fails will keep going with the commit:
 ## Uninstall
 
 Run:
-``` bash
+```shell script
 swift run -c release shusky uninstall
 ```
