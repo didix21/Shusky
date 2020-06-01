@@ -1,11 +1,7 @@
+import ArgumentParser
 import Foundation
 import ShuskyCore
 import Yams
-
-// let fileManager = FileManager.default
-// fileManager.changeCurrentDirectoryPath("/Users/didaccoll/repos/Shusky")
-
-import ArgumentParser
 
 enum ShuskyError: Error {
     case installFailed
@@ -16,12 +12,22 @@ enum ShuskyError: Error {
 
 struct Shusky: ParsableCommand {
     static let configuration = CommandConfiguration(
-        abstract: "Shusky utilities.",
+        abstract: """
+        Shusky. It's a tool for helping to manage and execute git hooks in Swift projects.
+            1. Install shusky with 'swift run shusky install'.
+            2. Add your hooks in '.shusky.yml' file that has been created in your root.
+
+        NOTE: To skip any git hook execution run: 'SKIP_SHUSKY=1 <git command>'.
+              For example, to skip pre-push run: 'SKIP_SHUSKY=1 git push'.
+        """,
         subcommands: [Install.self, Run.self, Uninstall.self]
     )
 
     struct Install: ParsableCommand {
-        static let configuration = CommandConfiguration(abstract: "Install all hooks available in .shusky.yml.")
+        static let configuration = CommandConfiguration(
+            abstract: "Install all hooks available in .shusky.yml. More info: 'swift run shusky install --help'",
+            discussion: "If .shusky.yml does not exist will be created."
+        )
 
         @Option(help: "Set Swift Package Manager path, if Package.swift is not in the root.")
         var packagePath: String?
@@ -36,7 +42,7 @@ struct Shusky: ParsableCommand {
 
     struct Run: ParsableCommand {
         static let configuration = CommandConfiguration(
-            abstract: "Use this command for running a hook in the .swift.yml"
+            abstract: "Use this command for running a hook in the .swift.yml. More info: 'swift run shusky run --help'"
         )
 
         @Option(help: "Set Swift Package Manager path, if Package.swift is not in the root.")

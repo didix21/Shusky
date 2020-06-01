@@ -32,6 +32,7 @@ git hooks with Swift. Can prevent `git commit` and `git push`.
 - Prevent, inter alia, `git commit`, `git push`...
 - Configure commands as non-critical. It allow to keep going with `git` command execution.
 - Configure commands as non-verbose. (Maybe does not work for all comands).
+- Skip git hooks with `SKIP_SHUSKY`. For example:`SKIP_SHUSKY=1 git commit -m `.
 
 ## Install
 

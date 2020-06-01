@@ -179,8 +179,7 @@ final class HookHandlerTests: XCTestCase {
             commands: [Command(run: Run(
                 command: "echo \"Shusky is ready, please configure .shusky.yml\"",
                 critical: false
-            )
-                )]
+            ))]
         )
         let printerMock = PrinterMock()
         let commandHandler = HookHandler(
@@ -191,5 +190,23 @@ final class HookHandlerTests: XCTestCase {
 
         XCTAssertEqual(commandHandler.run(), 0)
         XCTAssertEqual(printerMock.output, consoleResult)
+    }
+
+    func testIfSkipIsEnabled() {
+        setenv("SKIP_SHUSKY", "1", 1)
+        let hook = Hook(hookType: .preCommit, verbose: true, commands: [Command(run: Run(
+            command: "echo \"Shusky is ready, please configure .shusky.yml\"",
+            critical: false
+        ))])
+        let printerMock = PrinterMock()
+        let commandHandler = HookHandler(
+            hook: hook,
+            shell: ShellMock(commandOutput: "Shusky is ready, please configure .shusky.yml", statusCode: 0),
+            printer: printerMock
+        )
+
+        XCTAssertEqual(commandHandler.run(), 0)
+        XCTAssertEqual(printerMock.output, "")
+        unsetenv("SKIP_SHUSKY")
     }
 }
