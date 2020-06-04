@@ -49,7 +49,7 @@ final class ShuskyFileTests: XCTestCase {
     }
 
     func testCreateDefaultShuskyYamlFile() throws {
-        try shuskyFile.createDefaultShuskyYaml()
+        try shuskyFile.createDefaultShuskyYamlIfNeeded()
         let file = try File(path: "./\(fileName)")
         XCTAssertEqual(shuskyFile.defaultConfig, try! file.readAsString())
     }
@@ -58,7 +58,7 @@ final class ShuskyFileTests: XCTestCase {
         let folder = try Folder(path: "./")
         let file = try folder.createFile(at: fileName)
         try file.write("Some data there")
-        try shuskyFile.createDefaultShuskyYaml()
+        try shuskyFile.createDefaultShuskyYamlIfNeeded()
 
         XCTAssertEqual(try file.readAsString(), "Some data there")
     }

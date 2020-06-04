@@ -66,7 +66,7 @@ class ShuskyFile: Readable, Writable {
         }
     }
 
-    public func createDefaultShuskyYaml() throws {
+    public func createDefaultShuskyYamlIfNeeded() throws {
         try create()
         guard let content = try? read() else {
             try write(defaultConfig)

@@ -38,27 +38,16 @@ public final class ShuskyCore {
         return 1
     }
 
-    public func install(gitPath: String, shuskyPath: String? = nil, packagePath: String? = nil) -> Int32 {
+    public func install(gitPath: String, shuskyPath: String? = nil, packagePath: String? = nil,
+                        all: Bool = false) -> Int32 {
         let shuskyFile = ShuskyFile(path: shuskyPath)
         do {
-            try shuskyFile.createDefaultShuskyYaml()
-            let hooksParser = try ShuskyHooksParser(try shuskyFile.read())
+            try shuskyFile.createDefaultShuskyYamlIfNeeded()
 
-            for hookAvailable in hooksParser.availableHooks {
-                let gitHookFileHandler = GitHookFileHandler(
-                    hook: hookAvailable,
-                    path: gitPath,
-                    packagePath: packagePath
-                )
-                try gitHookFileHandler.addHook()
-            }
-
-            for hookNotAvailable in HookType.getAll() where !hooksParser.availableHooks.contains(hookNotAvailable) {
-                let gitHookFileHandler = GitHookFileHandler(
-                    hook: hookNotAvailable,
-                    path: gitPath
-                )
-                try gitHookFileHandler.deleteHook()
+            if all {
+                try installAll(gitPath: gitPath, packagePath: packagePath)
+            } else {
+                try installAvailableHooks(shuskyFile: shuskyFile, gitPath: gitPath, packagePath: packagePath)
             }
 
             return 0
@@ -70,6 +59,38 @@ public final class ShuskyCore {
         }
 
         return 1
+    }
+
+    private func installAvailableHooks(shuskyFile: ShuskyFile, gitPath: String, packagePath: String?) throws {
+        let hooksParser = try ShuskyHooksParser(try shuskyFile.read())
+
+        for hookAvailable in hooksParser.availableHooks {
+            let gitHookFileHandler = GitHookFileHandler(
+                hook: hookAvailable,
+                path: gitPath,
+                packagePath: packagePath
+            )
+            try gitHookFileHandler.addHook()
+        }
+
+        for hookNotAvailable in HookType.getAll() where !hooksParser.availableHooks.contains(hookNotAvailable) {
+            let gitHookFileHandler = GitHookFileHandler(
+                hook: hookNotAvailable,
+                path: gitPath
+            )
+            try gitHookFileHandler.deleteHook()
+        }
+    }
+
+    private func installAll(gitPath: String, packagePath: String?) throws {
+        for hook in HookType.getAll() {
+            let gitHookFileHandler = GitHookFileHandler(
+                hook: hook,
+                path: gitPath,
+                packagePath: packagePath
+            )
+            try gitHookFileHandler.addHook()
+        }
     }
 
     private func executeCommand(hook: Hook) -> Int32 {
