@@ -5,10 +5,10 @@ import XCTest
 import Yams
 
 final class ShuskyCoreTests: XCTestCase {
+    let packagePath = "Complex/Path/To/Execute/Swift/Package"
     let gitPath = ".git/hooks/"
     let shuskyFileName = ".shusky.yml"
     let tmpFolder = Folder.temporary
-    let packagePath = "Complex/Path/To/Execute/Swift/Package"
     var testFolder: Folder!
 
     func swiftRun(hookType: String) -> String {

@@ -23,7 +23,7 @@ public enum HookType: String {
     case postMerge = "post-merge"
     case prePush = "pre-push"
 
-    static func getAll() -> [HookType] {
+    public static func getAll() -> [HookType] {
         [
             .applypatchMsg,
             .preApplyPatch,
