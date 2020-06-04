@@ -45,6 +45,7 @@
             ("testCommandFailsButIsDefinedAsNonCritical", testCommandFailsButIsDefinedAsNonCritical),
             ("testCommandHandler", testCommandHandler),
             ("testCommandHandlerGlobalVerboseFalse", testCommandHandlerGlobalVerboseFalse),
+            ("testIfSkipIsEnabled", testIfSkipIsEnabled),
             (
                 "testIfVerboseIsSetFalseAndCommandFailsDisplayResult",
                 testIfVerboseIsSetFalseAndCommandFailsDisplayResult
@@ -74,11 +75,15 @@
                 "testDefaultContentOfShuskyYMlAndPreCommitConfigured",
                 testDefaultContentOfShuskyYMlAndPreCommitConfigured
             ),
+            ("testDefaultInstallAndThenInstallAll", testDefaultInstallAndThenInstallAll),
             ("testInstallAddMultipleHooksIfTheyAreConfigured", testInstallAddMultipleHooksIfTheyAreConfigured),
+            ("testInstallAllHooks", testInstallAllHooks),
+            ("testInstallAllHooksPackagePath", testInstallAllHooksPackagePath),
             (
                 "testInstallMustRemoveThoseHooksThatAreNoLongerPresentInShuskyYml",
                 testInstallMustRemoveThoseHooksThatAreNoLongerPresentInShuskyYml
             ),
+            ("testInstallWithPackagePath", testInstallWithPackagePath),
             ("testRunReturn0IfAllCommandsAreExecuted", testRunReturn0IfAllCommandsAreExecuted),
             ("testRunReturn1IfHookIsEmpty", testRunReturn1IfHookIsEmpty),
             ("testRunReturn1IfShuskyFileDoesNotExist", testRunReturn1IfShuskyFileDoesNotExist),

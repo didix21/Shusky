@@ -32,9 +32,12 @@ struct Shusky: ParsableCommand {
         @Option(help: "Set Swift Package Manager path, if Package.swift is not in the root.")
         var packagePath: String?
 
+        @Flag(help: "Use this flag for installing all git hooks.")
+        var all: Bool
+
         func run() throws {
             let shuskyCore = ShuskyCore()
-            if shuskyCore.install(gitPath: Shusky.getGitHookPath(), packagePath: packagePath) != 0 {
+            if shuskyCore.install(gitPath: Shusky.getGitHookPath(), packagePath: packagePath, all: all) != 0 {
                 throw ShuskyError.installFailed
             }
         }

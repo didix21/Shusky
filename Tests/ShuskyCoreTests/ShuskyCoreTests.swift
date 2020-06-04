@@ -8,6 +8,7 @@ final class ShuskyCoreTests: XCTestCase {
     let gitPath = ".git/hooks/"
     let shuskyFileName = ".shusky.yml"
     let tmpFolder = Folder.temporary
+    let packagePath = "Complex/Path/To/Execute/Swift/Package"
     var testFolder: Folder!
 
     func swiftRun(hookType: String) -> String {
@@ -81,6 +82,21 @@ final class ShuskyCoreTests: XCTestCase {
         XCTAssertEqual(result, 0)
     }
 
+    func testInstallWithPackagePath() throws {
+        let shuskyCore = ShuskyCore()
+        let result = shuskyCore.install(gitPath: gitPath, packagePath: packagePath)
+
+        XCTAssertEqual(result, 0)
+        XCTAssertEqual(
+            try File(path: gitPath + HookType.preCommit.rawValue).readAsString(),
+            swiftRunWithPath(hookType: HookType.preCommit.rawValue)
+        )
+        XCTAssertEqual(
+            try File(path: gitPath + HookType.prePush.rawValue).readAsString(),
+            swiftRunWithPath(hookType: HookType.prePush.rawValue)
+        )
+    }
+
     func testInstallMustRemoveThoseHooksThatAreNoLongerPresentInShuskyYml() throws {
         let config = """
         applypatch-msg:
@@ -112,6 +128,40 @@ final class ShuskyCoreTests: XCTestCase {
         }
 
         XCTAssertEqual(result, 0)
+    }
+
+    func testInstallAllHooks() throws {
+        let shuskyCore = ShuskyCore()
+        let result = shuskyCore.install(gitPath: gitPath, all: true)
+        for hook in HookType.getAll() {
+            let hookFile = try File(path: gitPath + hook.rawValue)
+            XCTAssertEqual(try hookFile.readAsString(), swiftRun(hookType: hook.rawValue))
+        }
+        XCTAssertEqual(result, 0)
+        XCTAssertEqual(try File(path: shuskyFileName).readAsString(), ShuskyFile().defaultConfig)
+    }
+
+    func testInstallAllHooksPackagePath() throws {
+        let shuskyCore = ShuskyCore()
+        let result = shuskyCore.install(gitPath: gitPath, packagePath: packagePath, all: true)
+        for hook in HookType.getAll() {
+            let hookFile = try File(path: gitPath + hook.rawValue)
+            XCTAssertEqual(try hookFile.readAsString(), swiftRunWithPath(hookType: hook.rawValue))
+        }
+        XCTAssertEqual(result, 0)
+        XCTAssertEqual(try File(path: shuskyFileName).readAsString(), ShuskyFile().defaultConfig)
+    }
+
+    func testDefaultInstallAndThenInstallAll() throws {
+        let shuskyCore = ShuskyCore()
+        _ = shuskyCore.install(gitPath: gitPath)
+        let resultInstallAll = shuskyCore.install(gitPath: gitPath, all: true)
+        for hook in HookType.getAll() {
+            let hookFile = try File(path: gitPath + hook.rawValue)
+            XCTAssertEqual(try hookFile.readAsString(), swiftRun(hookType: hook.rawValue))
+        }
+        XCTAssertEqual(resultInstallAll, 0)
+        XCTAssertEqual(try File(path: shuskyFileName).readAsString(), ShuskyFile().defaultConfig)
     }
 
     func testRunReturn1IfShuskyFileDoesNotExist() throws {
