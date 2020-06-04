@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.2.0](https://github.com/didix21/Shusky/tree/0.2.0) (2020-06-04)
+
+[Full Changelog](https://github.com/didix21/Shusky/compare/0.1.0...0.2.0)
+
+**Implemented enhancements:**
+
+- Allow to skip git hooks with SKIP\_SHUSKY=1 [\#30](https://github.com/didix21/Shusky/pull/30) ([didix21](https://github.com/didix21))
+
+**Closed issues:**
+
+- Implement a way for skiping git hooks [\#28](https://github.com/didix21/Shusky/issues/28)
+- Add a new option to installing command for installing all hooks [\#27](https://github.com/didix21/Shusky/issues/27)
+
+**Merged pull requests:**
+
+- Add all flag for installing all git hooks \#27 [\#31](https://github.com/didix21/Shusky/pull/31) ([didix21](https://github.com/didix21))
+
 ## [0.1.0](https://github.com/didix21/Shusky/tree/0.1.0) (2020-05-30)
 
 [Full Changelog](https://github.com/didix21/Shusky/compare/f8da1c4821e5b22cfc8cee7a8121185678341e70...0.1.0)
