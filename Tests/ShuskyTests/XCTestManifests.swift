@@ -6,7 +6,12 @@
         //   `swift test --generate-linuxmain`
         // to regenerate.
         static let __allTests__ShuskyTests = [
-            ("testExample", testExample),
+            ("testInstallAll", testInstallAll),
+            ("testInstall", testInstall),
+            ("testInstallAndRun", testInstallAndRun),
+            ("testInstallIsNotAGitRepository", testInstallIsNotAGitRepository),
+            ("testInstallPackagePath", testInstallPackagePath),
+            ("testRunFailsBecauseShuskyDoesNotExist", testRunFailsBecauseShuskyDoesNotExist),
         ]
     }
 
