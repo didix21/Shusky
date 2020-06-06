@@ -41,7 +41,7 @@ final class GitHookFileHandlerTests: XCTestCase {
     }
 
     func testAddHook() throws {
-        let expectedContent = "swift run -c release shusky run pre-commit\n"
+        let expectedContent = swiftRun(hookType: "pre-commit")
         let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path)
         try gitHookFileHandler.addHook()
         let file = try File(path: path + HookType.preCommit.rawValue)
@@ -50,7 +50,7 @@ final class GitHookFileHandlerTests: XCTestCase {
     }
 
     func testAddHookWithPackagePath() throws {
-        let expectedContent = "swift run -c release --package-path BuildTools shusky run pre-commit\n"
+        let expectedContent = swiftRunWithPath(hookType: "pre-commit", packagePath: "BuildTools")
         let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path, packagePath: "BuildTools")
         try gitHookFileHandler.addHook()
         let file = try File(path: path + HookType.preCommit.rawValue)
@@ -64,7 +64,7 @@ final class GitHookFileHandlerTests: XCTestCase {
         let content = "Write some content"
         try file.write(content)
 
-        let expectedContent = content + "\nswift run -c release shusky run pre-commit\n"
+        let expectedContent = content + "\n\(swiftRun(hookType: "pre-commit"))"
         let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path)
         try gitHookFileHandler.addHook()
 
@@ -79,7 +79,7 @@ final class GitHookFileHandlerTests: XCTestCase {
         let content = "Write some content"
         try file.write(content)
 
-        let expectedContent = content + "\nswift run -c release --package-path BuildTools shusky run pre-commit\n"
+        let expectedContent = content + "\n\(swiftRunWithPath(hookType: "pre-commit", packagePath: "BuildTools"))"
         let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path, packagePath: "BuildTools")
         try gitHookFileHandler.addHook()
         let actualContent = try file.readAsString()
@@ -90,7 +90,7 @@ final class GitHookFileHandlerTests: XCTestCase {
     func testDontAppendHookIfAlreadyExist() throws {
         let folder = try Folder(path: path)
         let file = try folder.createFileIfNeeded(at: HookType.preCommit.rawValue)
-        let expectedContent = "swift run -c release shusky run pre-commit\n"
+        let expectedContent = swiftRun(hookType: "pre-commit")
         try file.write(expectedContent)
 
         let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path)
@@ -102,7 +102,7 @@ final class GitHookFileHandlerTests: XCTestCase {
     func testDontAppendHookWithPackagePathIfAlreadyExist() throws {
         let folder = try Folder(path: path)
         let file = try folder.createFileIfNeeded(at: HookType.preCommit.rawValue)
-        let expectedContent = "swift run -c release --package-path BuildTools shusky run pre-commit\n"
+        let expectedContent = swiftRunWithPath(hookType: "pre-commit", packagePath: "BuildTools")
         try file.write(expectedContent)
 
         let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path, packagePath: "BuildTools")
@@ -121,7 +121,7 @@ final class GitHookFileHandlerTests: XCTestCase {
 
     func testDeleteHookFileMustBeDeleted() throws {
         let file = try testFolder.createFile(at: path + HookType.preCommit.rawValue)
-        let content = "swift run -c release shusky run pre-commit\n"
+        let content = swiftRun(hookType: "pre-commit")
         try file.write(content)
         let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path)
         try gitHookFileHandler.deleteHook()
@@ -135,7 +135,7 @@ final class GitHookFileHandlerTests: XCTestCase {
         git add -A
         git commit -m "New Commit"\n
         """
-        let content = expectedContent + "swift run -c release shusky run pre-commit\n"
+        let content = expectedContent + swiftRun(hookType: "pre-commit")
         try file.write(content)
         let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path)
         try gitHookFileHandler.deleteHook()
@@ -149,7 +149,7 @@ final class GitHookFileHandlerTests: XCTestCase {
         git add -A
         git commit -m "New Commit"\n
         """
-        let content = "swift run -c release shusky run pre-commit\n" + expectedContent
+        let content = "\(swiftRun(hookType: "pre-commit"))" + expectedContent
         try file.write(content)
         let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path)
         try gitHookFileHandler.deleteHook()
@@ -163,7 +163,7 @@ final class GitHookFileHandlerTests: XCTestCase {
         git add -A
         git commit -m "New Commit"\n
         """
-        let content = "git something\n" + "swift run -c release shusky run pre-commit\n" + expectedContent
+        let content = "git something\n" + swiftRun(hookType: "pre-commit") + expectedContent
         try file.write(content)
         let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path)
         try gitHookFileHandler.deleteHook()
@@ -173,7 +173,7 @@ final class GitHookFileHandlerTests: XCTestCase {
 
     func testDeleteHookFileMustBeDeletedWithPackagePath() throws {
         let file = try testFolder.createFile(at: path + HookType.preCommit.rawValue)
-        let content = "swift run -c release --package-path BuildTools shusky run pre-commit\n"
+        let content = swiftRunWithPath(hookType: "pre-commit", packagePath: "BuildTools")
         try file.write(content)
         let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path)
         try gitHookFileHandler.deleteHook()
@@ -187,7 +187,7 @@ final class GitHookFileHandlerTests: XCTestCase {
         git add -A
         git commit -m "New Commit"\n
         """
-        let content = "git something\n" + "swift run -c release --package-path BuildTools shusky run pre-commit\n"
+        let content = "git something\n" + swiftRunWithPath(hookType: "pre-commit", packagePath: "BuildTools")
             + expectedContent
         try file.write(content)
         let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path)
@@ -207,17 +207,5 @@ final class GitHookFileHandlerTests: XCTestCase {
         try gitHookFileHandler.deleteHook()
 
         XCTAssertEqual(try file.readAsString(), expectedContent)
-    }
-
-    // Returns path to the built products directory.
-    var productsDirectory: URL {
-        #if os(macOS)
-            for bundle in Bundle.allBundles where bundle.bundlePath.hasSuffix(".xctest") {
-                return bundle.bundleURL.deletingLastPathComponent()
-            }
-            fatalError("couldn't find the products directory")
-        #else
-            return Bundle.main.bundleURL
-        #endif
     }
 }

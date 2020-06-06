@@ -11,14 +11,6 @@ final class ShuskyCoreTests: XCTestCase {
     let tmpFolder = Folder.temporary
     var testFolder: Folder!
 
-    func swiftRun(hookType: String) -> String {
-        "swift run -c release shusky run \(hookType)\n"
-    }
-
-    func swiftRunWithPath(hookType: String, packagePath: String = "Complex/Path/To/Execute/Swift/Package") -> String {
-        "swift run -c release --package-path \(packagePath) shusky run \(hookType)\n"
-    }
-
     override func setUp() {
         // Setup a temp test folder that can be used as a sandbox
         testFolder = try! tmpFolder.createSubfolderIfNeeded(
@@ -43,6 +35,7 @@ final class ShuskyCoreTests: XCTestCase {
         let shuskyCore = ShuskyCore()
         let result = shuskyCore.install(gitPath: gitPath)
         let shuskyFile = try File(path: shuskyFileName)
+        let prePushFile = try File(path: "\(gitPath)pre-push")
         let preCommitFile = try File(path: "\(gitPath)pre-commit")
 
         XCTAssertEqual(
@@ -55,7 +48,8 @@ final class ShuskyCoreTests: XCTestCase {
 
             """
         )
-        XCTAssertEqual(try preCommitFile.readAsString(), "swift run -c release shusky run pre-commit\n")
+        XCTAssertEqual(try preCommitFile.readAsString(), swiftRun(hookType: "pre-commit"))
+        XCTAssertEqual(try prePushFile.readAsString(), swiftRun(hookType: "pre-push"))
         XCTAssertEqual(result, 0)
     }
 
