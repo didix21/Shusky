@@ -25,7 +25,11 @@
 Shusky is a port of [Husky](https://github.com/typicode/husky) to Swift which allow to execute
 git hooks with Swift. Can prevent `git commit` and `git push`.
 
-![run-gca](./docs/images/run-shusky-cli.gif)
+<a href="https://asciinema.org/a/qvlonNDKgmfYLgyslS7RzGY3C" target="_blank">
+    <p align="center">
+        <img src="https://asciinema.org/a/qvlonNDKgmfYLgyslS7RzGY3C.svg" />
+    </p>
+</a>
 
 ## Features
 

@@ -1,5 +1,5 @@
 import Files
-import class Foundation.Bundle
+import Foundation
 import ShuskyCore
 import XCTest
 
@@ -12,11 +12,28 @@ final class ShuskyTests: XCTestCase {
     var testFolder: Folder!
 
     func swiftRun(hookType: String) -> String {
-        "swift run -c release shusky run \(hookType)\n"
+        """
+        if [[ -f .build/release/shusky ]]; then
+            .build/release/shusky run \(hookType)
+        else
+            swift run -c release shusky run \(hookType)
+        fi
+
+        """
     }
 
-    func swiftRunWithPath(hookType: String, packagePath: String = "Complex/Path/To/Execute/Swift/Package") -> String {
-        "swift run -c release --package-path \(packagePath) shusky run \(hookType)\n"
+    func swiftRunWithPath(
+        hookType: String,
+        packagePath: String = "Complex/Path/To/Execute/Swift/Package"
+    ) -> String {
+        """
+        if [[ -f ./\(packagePath)/.build/release/shusky ]]; then
+            ./\(packagePath)/.build/release/shusky run \(hookType)
+        else
+            swift run -c release --package-path \(packagePath) shusky run \(hookType)
+        fi
+
+        """
     }
 
     func runShusky(subcommand: String? = nil) -> ShellResult {

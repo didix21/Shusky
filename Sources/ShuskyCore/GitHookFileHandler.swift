@@ -9,9 +9,31 @@ class GitHookFileHandler: Writable, Readable {
     var path: String
     private var hook: HookType
     private var packagePath: String?
-    private static var swiftRun = "swift run -c release"
-    private static var swiftRunWithPath = "swift run -c release --package-path"
-    private static var shuskyRun = "shusky run"
+    private var swiftRun = "swift run -c release"
+    private var swiftRunWithPath = "swift run -c release --package-path"
+    private var shuskyRun = "shusky run"
+    private var shuskyBinary = ".build/release/shusky"
+    private lazy var gitHookRun: String = {
+        """
+        if [[ -f \(self.shuskyBinary) ]]; then
+            \(self.shuskyBinary) run \(self.hook.rawValue)
+        else
+            \(self.swiftRun) \(self.shuskyRun) \(self.hook.rawValue)
+        fi
+
+        """
+    }()
+
+    private lazy var gitHookRunWIthPackagePath: (String) -> String = { (packagePath: String) -> String in
+        """
+        if [[ -f ./\(packagePath)/\(self.shuskyBinary) ]]; then
+            ./\(packagePath)/\(self.shuskyBinary) run \(self.hook.rawValue)
+        else
+            \(self.swiftRunWithPath) \(packagePath) \(self.shuskyRun) \(self.hook.rawValue)
+        fi
+
+        """
+    }
 
     public init(hook: HookType, path: String, packagePath: String? = nil) {
         self.hook = hook
@@ -52,8 +74,8 @@ class GitHookFileHandler: Writable, Readable {
     }
 
     private func getPackagePath(_ content: String) -> String? {
-        guard let startIndex = content.endIndex(of: "\(Self.swiftRunWithPath) "),
-            let endIndex = content.index(of: " \(Self.shuskyRun) \(hook.rawValue)\n") else {
+        guard let startIndex = content.endIndex(of: "\(swiftRunWithPath) "),
+            let endIndex = content.index(of: " \(shuskyRun) \(hook.rawValue)\n") else {
             return nil
         }
         return String(content[startIndex ... content.index(before: endIndex)])
@@ -61,13 +83,9 @@ class GitHookFileHandler: Writable, Readable {
 
     private func hookCommand() -> String {
         guard let packagePath = packagePath else {
-            return "\(Self.swiftRun) \(Self.shuskyRun) \(hook.rawValue)\n"
+            return gitHookRun
         }
-        return hookCommand(with: packagePath)
-    }
-
-    private func hookCommand(with packagePath: String) -> String {
-        "\(Self.swiftRunWithPath) \(packagePath) \(Self.shuskyRun) \(hook.rawValue)\n"
+        return gitHookRunWIthPackagePath(packagePath)
     }
 
     private func setUserExecutablePermissions() throws {

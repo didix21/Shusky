@@ -32,7 +32,10 @@ let package = Package(
         ),
         .testTarget(
             name: "ShuskyTests",
-            dependencies: ["Shusky", .product(name: "ArgumentParser", package: "swift-argument-parser")]
+            dependencies: [
+                "Shusky",
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
+            ]
         ),
         .testTarget(
             name: "ShuskyCoreTests",
