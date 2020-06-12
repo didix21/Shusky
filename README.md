@@ -15,7 +15,7 @@
 ## Table of Contents
 
 - [Overview](#overview)
-- [Features](@features)
+- [Features](#features)
 - [Install](#install)
 - [How to use](#how-to-use)
 - [Uninstall](#uninstall)
@@ -49,10 +49,13 @@ Add the following code to your `Package.swift` file.
 Then:
 
 - If you have your `Package.swift` file in the root, run:
+
     ``` bash
     swift run -c release shusky install
     ```
+  
 - If you have your `Package.swift` file to another path, run:
+
     ``` bash
     swift run -c release --package-path YourPath shusky install --package-path YourPath
     ```
@@ -73,6 +76,7 @@ it only will add the command for running shusky. More info in [Advanced installa
 ## How to use
 
 - Only need to add your commands in `.shusky.yml` configuration file. For example:
+
     ```yaml
     pre-push:
         - set -o pipefail && swift test 2>&1 | xcpretty --color
@@ -83,6 +87,7 @@ it only will add the command for running shusky. More info in [Advanced installa
     ```
 
 - **If you add a new hook you must run again** `shusky install`. For example:
+
     ```yaml
     pre-push:
         - set -o pipefail && swift test 2>&1 | xcpretty --color
@@ -95,6 +100,7 @@ it only will add the command for running shusky. More info in [Advanced installa
     ```
 
 - You can add especial behaviour to commands using the key `run`. For example you can set non-verbose to commands. Then only wil display output result only if the command fails. For example:
+
     ```yaml
     pre-commit:
         - swift run -c release swiftformat .
@@ -107,6 +113,7 @@ it only will add the command for running shusky. More info in [Advanced installa
 
 -  Maybe while you're developing you don't want to cancel the `git commit` if one of the commands fail. So you can set propierty `critical` to `false`.
 In this example, if `swiftlint` fails will keep going with the commit:
+
     ```yaml
     pre-commit:
         - swift run -c release swiftformat .
@@ -123,6 +130,7 @@ In this example, if `swiftlint` fails will keep going with the commit:
 ## Uninstall
 
 Run:
+
 ```shell script
 swift run -c release shusky uninstall
 ```
