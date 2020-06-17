@@ -2,6 +2,7 @@
 // Created by Dídac Coll Pujals on 24/05/2020.
 //
 
+import Files
 import Foundation
 @testable import ShuskyCore
 import XCTest
@@ -115,8 +116,7 @@ final class HookHandlerTests: XCTestCase {
             commands: [Command(run: Run(
                 command: "echo \"Shusky is ready, please configure .shusky.yml\"",
                 verbose: true
-            )
-                )]
+            ))]
         )
         let printerMock = PrinterMock()
         let commandHandler = HookHandler(hook: hook, shell: Shell(), printer: printerMock)
@@ -140,7 +140,9 @@ final class HookHandlerTests: XCTestCase {
         let commandHandler = HookHandler(
             hook: hook,
             shell: ShellMock(commandOutput: "Shusky is ready, please configure .shusky.yml", statusCode: 32),
-            printer: printerMock
+            printer: printerMock,
+            stderrFile: "",
+            stdoutFile: ""
         )
         XCTAssertEqual(commandHandler.run(), 32)
         XCTAssertEqual(printerMock.output, consoleResult)
@@ -161,7 +163,9 @@ final class HookHandlerTests: XCTestCase {
         let commandHandler = HookHandler(
             hook: hook,
             shell: ShellMock(commandOutput: "Shusky is ready, please configure .shusky.yml", statusCode: 32),
-            printer: printerMock
+            printer: printerMock,
+            stderrFile: "",
+            stdoutFile: ""
         )
         XCTAssertEqual(commandHandler.run(), 32)
         XCTAssertEqual(printerMock.output, consoleResult)
@@ -185,7 +189,9 @@ final class HookHandlerTests: XCTestCase {
         let commandHandler = HookHandler(
             hook: hook,
             shell: ShellMock(commandOutput: "Shusky is ready, please configure .shusky.yml", statusCode: 32),
-            printer: printerMock
+            printer: printerMock,
+            stderrFile: "",
+            stdoutFile: ""
         )
 
         XCTAssertEqual(commandHandler.run(), 0)
