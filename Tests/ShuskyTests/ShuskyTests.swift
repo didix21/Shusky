@@ -11,7 +11,7 @@ final class ShuskyTests: XCTestCase {
     let shuskyFileName = ".shusky.yml"
     var testFolder: Folder!
 
-    func swiftRun(hookType: String) -> String {
+    private func swiftRun(hookType: String) -> String {
         """
         if [[ -f .build/release/shusky ]]; then
             .build/release/shusky run \(hookType)
@@ -22,7 +22,7 @@ final class ShuskyTests: XCTestCase {
         """
     }
 
-    func swiftRunWithPath(
+    private func swiftRunWithPath(
         hookType: String,
         packagePath: String = "Complex/Path/To/Execute/Swift/Package"
     ) -> String {

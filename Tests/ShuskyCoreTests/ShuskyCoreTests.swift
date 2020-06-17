@@ -224,6 +224,22 @@ final class ShuskyCoreTests: XCTestCase {
         XCTAssertEqual(exitCode, 0)
     }
 
+    func testRunVerboseFalse() throws {
+        let config = """
+        pre-commit:
+           - run:
+               command: echo print something; exit 1
+               verbose: false
+        """
+        let file = try testFolder.createFile(named: shuskyFileName)
+        try file.write(config)
+        let shuskyCore = ShuskyCore()
+        let exitCode = shuskyCore.run(hookType: .preCommit)
+        XCTAssertEqual(exitCode, 1)
+        XCTAssertNil(try? File(path: "/var/tmp/shusky_stderr").readAsString())
+        XCTAssertNil(try? File(path: "/var/tmp/shusky_stdout").readAsString())
+    }
+
     func testRunUninstall() throws {
         for hook in HookType.getAll() {
             let file = try testFolder.createFile(at: gitPath + hook.rawValue)

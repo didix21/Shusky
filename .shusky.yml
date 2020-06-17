@@ -2,8 +2,11 @@ pre-push:
     - run:
         command: set -o pipefail && swift test 2>&1 | xcpretty --color
         critical: false
-        verbose: false
 pre-commit:
-    - swift run -c release --package-path BuildTools swiftformat .
-    - swift run -c release --package-path BuildTools swiftlint lint --strict .
+    - run:
+        command: swift run -c release --package-path BuildTools swiftformat .
+        verbose: false
+    - run:
+        command: swift run -c release --package-path BuildTools swiftlint lint --strict .
+        verbose: false
     - git add -A

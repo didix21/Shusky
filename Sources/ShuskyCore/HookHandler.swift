@@ -2,6 +2,7 @@
 // Created by Dídac Coll Pujals on 24/05/2020.
 //
 
+import Files
 import Foundation
 
 public enum ANSIColors: String {
@@ -76,10 +77,20 @@ final class HookHandler {
     let hook: Hook
     let shell: Executable
     let printer: Printable
-    init(hook: Hook, shell: Executable, printer: Printable) {
+    let stderrFile: String
+    let stdoutFile: String
+    init(
+        hook: Hook,
+        shell: Executable,
+        printer: Printable,
+        stderrFile: String = "/var/tmp/shusky_stderr",
+        stdoutFile: String = "/var/tmp/shusky_stdout"
+    ) {
         self.hook = hook
         self.shell = shell
         self.printer = printer
+        self.stderrFile = stderrFile
+        self.stdoutFile = stdoutFile
     }
 
     public func run() -> Int32 {
@@ -127,6 +138,12 @@ final class HookHandler {
         guard result.status == 0 else {
             if !isVerbose(command: command) {
                 printer.print(result.output)
+                if let stdout = getStdOut() {
+                    printer.print(stdout)
+                }
+                if let stderr = getStdErr() {
+                    printer.printc(.red, stderr)
+                }
             }
             if !isCritical(command: command) {
                 return .isNotCritical(errorCode: result.status)
@@ -135,6 +152,28 @@ final class HookHandler {
         }
 
         return .success
+    }
+
+    private func getStdErr() -> String? {
+        var outError: String?
+        if let stderr = try? File(path: stderrFile) {
+            if let errors = try? stderr.readAsString() {
+                outError = errors
+            }
+            try? stderr.delete()
+        }
+        return outError
+    }
+
+    private func getStdOut() -> String? {
+        var out: String?
+        if let stdout = try? File(path: stdoutFile) {
+            if let output = try? stdout.readAsString() {
+                out = output
+            }
+            try? stdout.delete()
+        }
+        return out
     }
 
     private func runVerbose(_ command: Command) -> ShellResult {
@@ -148,7 +187,7 @@ final class HookHandler {
     }
 
     private func runLaconic(_ command: Command) -> ShellResult {
-        shell.execute(command.run.command)
+        shell.execute(command.run.command + " >\(stdoutFile) 2>\(stderrFile)")
     }
 
     private func isSkipEnabled() -> Bool {
