@@ -9,6 +9,7 @@ class GitHookFileHandler: Writable, Readable {
     var path: String
     private var hook: HookType
     private var packagePath: String?
+    private let overwrite: Bool
     private var swiftRun = "swift run -c release"
     private var swiftRunWithPath = "swift run -c release --package-path"
     private var shuskyRun = "shusky run"
@@ -35,15 +36,16 @@ class GitHookFileHandler: Writable, Readable {
         """
     }
 
-    public init(hook: HookType, path: String, packagePath: String? = nil) {
+    public init(hook: HookType, path: String, packagePath: String? = nil, overwrite: Bool = false) {
         self.hook = hook
         fileName = hook.rawValue
         self.path = path
         self.packagePath = packagePath
+        self.overwrite = overwrite
     }
 
     public func addHook() throws {
-        if let content = try? read() {
+        if !overwrite, let content = try? read() {
             guard !content.contains(hookCommand()) else { return }
             try append("\n" + hookCommand())
             try setUserExecutablePermissions()

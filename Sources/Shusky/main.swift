@@ -35,9 +35,17 @@ struct Shusky: ParsableCommand {
         @Flag(help: "Use this flag for installing all git hooks.")
         var all: Bool
 
+        @Flag(help: "Use this flag for letting shusky overwrite any hook file that already exists.")
+        var overwrite: Bool
+
         func run() throws {
             let shuskyCore = ShuskyCore()
-            if shuskyCore.install(gitPath: Shusky.getGitHookPath(), packagePath: packagePath, all: all) != 0 {
+            if shuskyCore.install(
+                gitPath: Shusky.getGitHookPath(),
+                packagePath: packagePath,
+                all: all,
+                overwrite: overwrite
+            ) != 0 {
                 throw ShuskyError.installFailed
             }
         }
