@@ -38,16 +38,26 @@ public final class ShuskyCore {
         return 1
     }
 
-    public func install(gitPath: String, shuskyPath: String? = nil, packagePath: String? = nil,
-                        all: Bool = false) -> Int32 {
+    public func install(
+        gitPath: String,
+        shuskyPath: String? = nil,
+        packagePath: String? = nil,
+        all: Bool = false,
+        overwrite: Bool = false
+    ) -> Int32 {
         let shuskyFile = ShuskyFile(path: shuskyPath)
         do {
             try shuskyFile.createDefaultShuskyYamlIfNeeded()
 
             if all {
-                try installAll(gitPath: gitPath, packagePath: packagePath)
+                try installAll(gitPath: gitPath, packagePath: packagePath, overwrite: overwrite)
             } else {
-                try installAvailableHooks(shuskyFile: shuskyFile, gitPath: gitPath, packagePath: packagePath)
+                try installAvailableHooks(
+                    shuskyFile: shuskyFile,
+                    gitPath: gitPath,
+                    packagePath: packagePath,
+                    overwrite: overwrite
+                )
             }
 
             return 0
@@ -61,14 +71,20 @@ public final class ShuskyCore {
         return 1
     }
 
-    private func installAvailableHooks(shuskyFile: ShuskyFile, gitPath: String, packagePath: String?) throws {
+    private func installAvailableHooks(
+        shuskyFile: ShuskyFile,
+        gitPath: String,
+        packagePath: String?,
+        overwrite: Bool
+    ) throws {
         let hooksParser = try ShuskyHooksParser(try shuskyFile.read())
 
         for hookAvailable in hooksParser.availableHooks {
             let gitHookFileHandler = GitHookFileHandler(
                 hook: hookAvailable,
                 path: gitPath,
-                packagePath: packagePath
+                packagePath: packagePath,
+                overwrite: overwrite
             )
             try gitHookFileHandler.addHook()
         }
@@ -82,12 +98,13 @@ public final class ShuskyCore {
         }
     }
 
-    private func installAll(gitPath: String, packagePath: String?) throws {
+    private func installAll(gitPath: String, packagePath: String?, overwrite: Bool) throws {
         for hook in HookType.getAll() {
             let gitHookFileHandler = GitHookFileHandler(
                 hook: hook,
                 path: gitPath,
-                packagePath: packagePath
+                packagePath: packagePath,
+                overwrite: overwrite
             )
             try gitHookFileHandler.addHook()
         }

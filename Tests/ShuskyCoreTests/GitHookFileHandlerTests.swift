@@ -111,6 +111,23 @@ final class GitHookFileHandlerTests: XCTestCase {
         XCTAssertEqual(actualContent, expectedContent)
     }
 
+    func testOverwriteHookWhenOverwriteOptionIsProvided() throws {
+        let folder = try Folder(path: path)
+        let file = try folder.createFileIfNeeded(at: HookType.preCommit.rawValue)
+        let content = "Write some content"
+        try file.write(content)
+
+        let expectedContent = swiftRunWithPath(hookType: "pre-commit", packagePath: "BuildTools")
+        let gitHookFileHandler = GitHookFileHandler(
+            hook: .preCommit, path: path,
+            packagePath: "BuildTools", overwrite: true
+        )
+        try gitHookFileHandler.addHook()
+        let actualContent = try file.readAsString()
+
+        XCTAssertEqual(actualContent, expectedContent)
+    }
+
     func testExecutionPermissions() throws {
         let gitHookFileHandler = GitHookFileHandler(hook: .preCommit, path: path, packagePath: "BuildTools")
         try gitHookFileHandler.addHook()

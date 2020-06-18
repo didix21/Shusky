@@ -4,6 +4,7 @@ import Foundation
 import XCTest
 import Yams
 
+// swiftlint:disable:next type_body_length
 final class ShuskyCoreTests: XCTestCase {
     let packagePath = "Complex/Path/To/Execute/Swift/Package"
     let gitPath = ".git/hooks/"
@@ -89,6 +90,24 @@ final class ShuskyCoreTests: XCTestCase {
             try File(path: gitPath + HookType.prePush.rawValue).readAsString(),
             swiftRunWithPath(hookType: HookType.prePush.rawValue)
         )
+    }
+
+    func testInstallMustOverwriteHookIfAlreadyExistsAndOverwriteParamIsProvided() throws {
+        let config = """
+        pre-commit:
+           - echo print something
+        """
+        let content = "Some content in a hook file\n"
+        let hookFile = try testFolder.createFile(at: gitPath + HookType.preCommit.rawValue)
+        try hookFile.write(content)
+        let file = try testFolder.createFile(named: shuskyFileName)
+        try file.write(config)
+        let shuskyCore = ShuskyCore()
+        let result = shuskyCore.install(gitPath: gitPath, overwrite: true)
+        let preCommit = try File(path: "\(gitPath)pre-commit")
+
+        XCTAssertEqual(try preCommit.readAsString(), swiftRun(hookType: "pre-commit"))
+        XCTAssertEqual(result, 0)
     }
 
     func testInstallMustRemoveThoseHooksThatAreNoLongerPresentInShuskyYml() throws {
