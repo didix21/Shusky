@@ -20,6 +20,7 @@ struct Shusky: ParsableCommand {
         NOTE: To skip any git hook execution run: 'SKIP_SHUSKY=1 <git command>'.
               For example, to skip pre-push run: 'SKIP_SHUSKY=1 git push'.
         """,
+        version: "1.1.0",
         subcommands: [Install.self, Run.self, Uninstall.self]
     )
 

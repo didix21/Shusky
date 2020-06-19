@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.1.0](https://github.com/didix21/Shusky/tree/1.1.0) (2020-06-19)
+
+[Full Changelog](https://github.com/didix21/Shusky/compare/1.0.0...1.1.0)
+
+**Implemented enhancements:**
+
+- Add overwrite option for installing Shusky [\#36](https://github.com/didix21/Shusky/issues/36)
+- Add overwrite \#36 [\#38](https://github.com/didix21/Shusky/pull/38) ([didix21](https://github.com/didix21))
+
+**Fixed bugs:**
+
+- Verbose = false not working as expected [\#35](https://github.com/didix21/Shusky/issues/35)
+- Fix \#35: verbose is false is not working as expected [\#37](https://github.com/didix21/Shusky/pull/37) ([didix21](https://github.com/didix21))
+
 ## [1.0.0](https://github.com/didix21/Shusky/tree/1.0.0) (2020-06-06)
 
 [Full Changelog](https://github.com/didix21/Shusky/compare/0.2.0...1.0.0)
@@ -24,7 +38,6 @@
 **Implemented enhancements:**
 
 - Allow to skip git hooks with SKIP\_SHUSKY=1 [\#30](https://github.com/didix21/Shusky/pull/30) ([didix21](https://github.com/didix21))
-- Add README.md \#7 [\#24](https://github.com/didix21/Shusky/pull/24) ([didix21](https://github.com/didix21))
 
 **Closed issues:**
 
@@ -54,6 +67,7 @@
 - Add the following icons for show in console [\#3](https://github.com/didix21/Shusky/issues/3)
 - Add behaviour when Critical param is defined inside run [\#2](https://github.com/didix21/Shusky/issues/2)
 - Create Models [\#1](https://github.com/didix21/Shusky/issues/1)
+- Add README.md \#7 [\#24](https://github.com/didix21/Shusky/pull/24) ([didix21](https://github.com/didix21))
 - Add SwiftFormat and SwiftLint \#21 [\#22](https://github.com/didix21/Shusky/pull/22) ([didix21](https://github.com/didix21))
 - Implement shusky command line \#13 [\#20](https://github.com/didix21/Shusky/pull/20) ([didix21](https://github.com/didix21))
 - Add new features to ShuskyCore \#2, \#3, \#17 [\#18](https://github.com/didix21/Shusky/pull/18) ([didix21](https://github.com/didix21))
