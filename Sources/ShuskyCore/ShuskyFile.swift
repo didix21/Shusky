@@ -10,8 +10,8 @@ public protocol Readable: Nameable {
     func read() throws -> String
 }
 
-extension Readable {
-    public func read() throws -> String {
+public extension Readable {
+    func read() throws -> String {
         let file = try File(path: path + fileName)
         return try file.readAsString()
     }

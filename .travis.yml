@@ -3,7 +3,7 @@ jobs:
   include:
     - stage: OSX test and build xcode11
       os: osx
-      osx_image: xcode11
+      osx_image: xcode11.5
       language: objective-c
       cache:
         directories:
@@ -20,7 +20,7 @@ jobs:
         - bash <(curl https://codecov.io/bash)
     - stage: OSX test and build last
       os: osx
-      osx_image: xcode11.5
+      osx_image: xcode12
       language: objective-c
       cache:
         directories:

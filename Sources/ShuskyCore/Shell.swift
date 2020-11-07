@@ -16,8 +16,8 @@ protocol Executable {
 
 public final class Shell: Executable {
     private(set) var launchPath: String = "/bin/bash"
-    private var task: Process = Process()
-    private var pipe: Pipe = Pipe()
+    private var task = Process()
+    private var pipe = Pipe()
     public init(launchPath: String? = nil) {
         if let launchPath = launchPath {
             self.launchPath = launchPath
