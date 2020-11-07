@@ -8,7 +8,6 @@ import Foundation
 import XCTest
 import Yams
 
-// swiftlint:disable type_body_length
 final class ShuskyModelsTests: XCTestCase {
     let preCommit = "pre-commit:"
     let echo = "echo \"print with bash\""
@@ -30,28 +29,11 @@ final class ShuskyModelsTests: XCTestCase {
         RunConfigTests.mapToStr(config)
     }
 
-    func testRunInvalidCommand() throws {
-        let config = """
-        bubu jfklsd
-        """
-        guard let yml = try Yams.load(yaml: config) else { return XCTFail("Can not parse yaml file") }
-        assert(try Run.parse(yml), throws: Run.RunError.invalidData("bubu jfklsd"))
-    }
-
-    func testRunInvalidDataInCommand() throws {
-        let config = """
-        command: true
-        """
-        guard let yml = try Yams.load(yaml: config) else { return XCTFail("Can not parse yaml file") }
-        assert(try Run.parse(yml), throws: Run.RunError.invalidTypeInRunKey(.command, "true"))
-    }
-
     func testRunCommand() throws {
         let config = """
         command: swift run shusky install
         """
-        guard let yml = try Yams.load(yaml: config) else { return XCTFail("Can not parse yaml file") }
-        let run = try Run.parse(yml)
+        let run = try YAMLDecoder().decode(Run.self, from: config)
         XCTAssertEqual(run, Run(command: "swift run shusky install"))
     }
 
@@ -60,8 +42,16 @@ final class ShuskyModelsTests: XCTestCase {
         command: swift run shusky install
         path: true
         """
-        guard let yml = try Yams.load(yaml: config) else { return XCTFail("Can not parse yaml file") }
-        assert(try Run.parse(yml), throws: Run.RunError.invalidTypeInRunKey(.path, "true"))
+        do {
+            _ = try YAMLDecoder().decode(Run.self, from: config)
+        } catch let error as DecodingError {
+            switch error {
+            case .typeMismatch:
+                break
+            default:
+                XCTFail("Expected DecodingError.typeMismatch but got \(error)")
+            }
+        }
     }
 
     func testRunPath() throws {
@@ -69,18 +59,8 @@ final class ShuskyModelsTests: XCTestCase {
         command: swift run shusky install
         path: ./my/path
         """
-        guard let yml = try Yams.load(yaml: config) else { return XCTFail("Can not parse yaml file") }
-        let run = try Run.parse(yml)
+        let run = try YAMLDecoder().decode(Run.self, from: config)
         XCTAssertEqual(run, Run(command: "swift run shusky install", path: "./my/path"))
-    }
-
-    func testRunInvalidDataInCritical() throws {
-        let config = """
-        command: swift run shusky install
-        critical: Invalid data
-        """
-        guard let yml = try Yams.load(yaml: config) else { return XCTFail("Can not parse yaml file") }
-        assert(try Run.parse(yml), throws: Run.RunError.invalidTypeInRunKey(.critical, "Invalid data"))
     }
 
     func testRunCritical() throws {
@@ -88,18 +68,8 @@ final class ShuskyModelsTests: XCTestCase {
         command: swift run shusky install
         critical: false
         """
-        guard let yml = try Yams.load(yaml: config) else { return XCTFail("Can not parse yaml file") }
-        let run = try Run.parse(yml)
+        let run = try YAMLDecoder().decode(Run.self, from: config)
         XCTAssertEqual(run, Run(command: "swift run shusky install", critical: false))
-    }
-
-    func testRunInvalidDataInVerbose() throws {
-        let config = """
-        command: swift run shusky install
-        verbose: Invalid data
-        """
-        guard let yml = try Yams.load(yaml: config) else { return XCTFail("Can not parse yaml file") }
-        assert(try Run.parse(yml), throws: Run.RunError.invalidTypeInRunKey(.verbose, "Invalid data"))
     }
 
     func testRunVerbose() throws {
@@ -107,49 +77,38 @@ final class ShuskyModelsTests: XCTestCase {
         command: swift run shusky install
         verbose: true
         """
-        guard let yml = try Yams.load(yaml: config) else { return XCTFail("Can not parse yaml file") }
-        let run = try Run.parse(yml)
+        let run = try YAMLDecoder().decode(Run.self, from: config)
         XCTAssertEqual(run, Run(command: "swift run shusky install", verbose: true))
-    }
-
-    func testInvalidCommand() throws {
-        let config = """
-        - This is an invalid command
-        - Another invalid command
-        """
-        assert(
-            try Command.parse(getYamlContent(config)),
-            throws: Command.CommandError.invalidData("[\"This is an invalid command\", \"Another invalid command\"]")
-        )
     }
 
     func testRunWithInvalidTypeCommand() throws {
         let config = genRunConfig([.command(true)])
         do {
-            _ = try Command.parse(getYamlContent(config))
+            let json = try JSONSerialization.data(withJSONObject: getYamlContent(config))
+            _ = try JSONDecoder().decode(Command.self, from: json)
         } catch {
-            XCTAssertNotNil(error as? Command.CommandError)
+            XCTAssertNotNil(error)
         }
     }
 
     func testRunWithCommandDefined() throws {
         let config = genRunConfig([.command(echo)])
         let command = Command(run: Run(command: echo))
-        let actualCommand = try Command.parse(getYamlContent(config))
+        let actualCommand = try YAMLDecoder().decode(Command.self, from: config)
         XCTAssertEqual(actualCommand, command)
     }
 
     func testRunWithCommandPathCriticalDefined() throws {
         let config = genRunConfig([.command(echo), .path(path), .critical(critical)])
         let command = Command(run: Run(command: echo, path: path, critical: critical))
-        let actualCommand = try Command.parse(getYamlContent(config))
+        let actualCommand = try YAMLDecoder().decode(Command.self, from: config)
         XCTAssertEqual(actualCommand, command)
     }
 
     func testRunWithCommandPathCriticalVerboseDefined() throws {
         let config = genRunConfig([.command(echo), .path(path), .critical(critical), .verbose(verbose)])
         let command = Command(run: Run(command: echo, path: path, critical: critical, verbose: verbose))
-        let actualCommand = try Command.parse(getYamlContent(config))
+        let actualCommand = try YAMLDecoder().decode(Command.self, from: config)
         XCTAssertEqual(actualCommand, command)
     }
 
@@ -162,16 +121,16 @@ final class ShuskyModelsTests: XCTestCase {
         """
         let yml = try Yams.load(yaml: config)
         guard let data = yml as? [String: Any] else { return XCTFail(" Is not a dict ") }
-        assert(
-            try Hook.parse(hookType: .preCommit, data),
-            throws: Hook.HookError.invalidCommand(
-                .preCommit,
-                .invalidRun(
-                    .run,
-                    .invalidTypeInRunKey(.command, "true")
-                )
-            )
-        )
+        do {
+            _ = try Hook.parse(hookType: .preCommit, data)
+        } catch let error as DecodingError {
+            switch error {
+            case .typeMismatch:
+                break
+            default:
+                XCTFail("Expected DecodingError.typeMismatch but got \(error)")
+            }
+        }
     }
 
     func testHookNotFound() throws {
@@ -204,10 +163,7 @@ final class ShuskyModelsTests: XCTestCase {
         guard let data = yml as? [String: Any] else { return XCTFail(" Is not a dict ") }
         assert(
             try Hook.parse(hookType: .prePush, data),
-            throws: Hook.HookError.invalidCommand(
-                .prePush,
-                .invalidRun(.run, .invalidData("<null>"))
-            )
+            throws: Hook.HookError.invalidCommand(.prePush, .invalidRun)
         )
     }
 

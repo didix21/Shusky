@@ -122,7 +122,7 @@ final class ShuskyCoreTests: XCTestCase {
         let file = try testFolder.createFile(named: shuskyFileName)
         try file.write(config)
 
-        for hook in HookType.getAll() {
+        for hook in HookType.allCases {
             let file = try testFolder.createFile(at: gitPath + hook.rawValue)
             try file.write(swiftRunWithPath(hookType: hook.rawValue))
         }
@@ -132,7 +132,7 @@ final class ShuskyCoreTests: XCTestCase {
 
         let expectedHooksInstalled: [HookType] = [.applypatchMsg, .prePush, .preCommit]
 
-        for hook in HookType.getAll() where !expectedHooksInstalled.contains(hook) {
+        for hook in HookType.allCases where !expectedHooksInstalled.contains(hook) {
             XCTAssertNil(try? File(path: gitPath + hook.rawValue))
         }
 
@@ -146,7 +146,7 @@ final class ShuskyCoreTests: XCTestCase {
     func testInstallAllHooks() throws {
         let shuskyCore = ShuskyCore()
         let result = shuskyCore.install(gitPath: gitPath, all: true)
-        for hook in HookType.getAll() {
+        for hook in HookType.allCases {
             let hookFile = try File(path: gitPath + hook.rawValue)
             XCTAssertEqual(try hookFile.readAsString(), swiftRun(hookType: hook.rawValue))
         }
@@ -157,7 +157,7 @@ final class ShuskyCoreTests: XCTestCase {
     func testInstallAllHooksPackagePath() throws {
         let shuskyCore = ShuskyCore()
         let result = shuskyCore.install(gitPath: gitPath, packagePath: packagePath, all: true)
-        for hook in HookType.getAll() {
+        for hook in HookType.allCases {
             let hookFile = try File(path: gitPath + hook.rawValue)
             XCTAssertEqual(try hookFile.readAsString(), swiftRunWithPath(hookType: hook.rawValue))
         }
@@ -169,7 +169,7 @@ final class ShuskyCoreTests: XCTestCase {
         let shuskyCore = ShuskyCore()
         _ = shuskyCore.install(gitPath: gitPath)
         let resultInstallAll = shuskyCore.install(gitPath: gitPath, all: true)
-        for hook in HookType.getAll() {
+        for hook in HookType.allCases {
             let hookFile = try File(path: gitPath + hook.rawValue)
             XCTAssertEqual(try hookFile.readAsString(), swiftRun(hookType: hook.rawValue))
         }
@@ -260,7 +260,7 @@ final class ShuskyCoreTests: XCTestCase {
     }
 
     func testRunUninstall() throws {
-        for hook in HookType.getAll() {
+        for hook in HookType.allCases {
             let file = try testFolder.createFile(at: gitPath + hook.rawValue)
             try file.write(swiftRun(hookType: hook.rawValue))
         }
@@ -268,7 +268,7 @@ final class ShuskyCoreTests: XCTestCase {
         let shuskyCore = ShuskyCore()
         let result = shuskyCore.uninstall(gitPath: gitPath)
 
-        for hook in HookType.getAll() {
+        for hook in HookType.allCases {
             XCTAssertNil(try? File(path: gitPath + hook.rawValue))
         }
 
@@ -276,7 +276,7 @@ final class ShuskyCoreTests: XCTestCase {
     }
 
     func testRunUninstallWithPackagePath() throws {
-        for hook in HookType.getAll() {
+        for hook in HookType.allCases {
             let file = try testFolder.createFile(at: gitPath + hook.rawValue)
             try file.write(swiftRunWithPath(hookType: hook.rawValue))
         }
@@ -284,7 +284,7 @@ final class ShuskyCoreTests: XCTestCase {
         let shuskyCore = ShuskyCore()
         let result = shuskyCore.uninstall(gitPath: gitPath)
 
-        for hook in HookType.getAll() {
+        for hook in HookType.allCases {
             XCTAssertNil(try? File(path: gitPath + hook.rawValue))
         }
 

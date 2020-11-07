@@ -33,6 +33,7 @@
             ("testDontAppendHookIfAlreadyExist", testDontAppendHookIfAlreadyExist),
             ("testDontAppendHookWithPackagePathIfAlreadyExist", testDontAppendHookWithPackagePathIfAlreadyExist),
             ("testExecutionPermissions", testExecutionPermissions),
+            ("testOverwriteHookWhenOverwriteOptionIsProvided", testOverwriteHookWhenOverwriteOptionIsProvided),
         ]
     }
 
@@ -80,6 +81,10 @@
             ("testInstallAllHooks", testInstallAllHooks),
             ("testInstallAllHooksPackagePath", testInstallAllHooksPackagePath),
             (
+                "testInstallMustOverwriteHookIfAlreadyExistsAndOverwriteParamIsProvided",
+                testInstallMustOverwriteHookIfAlreadyExistsAndOverwriteParamIsProvided
+            ),
+            (
                 "testInstallMustRemoveThoseHooksThatAreNoLongerPresentInShuskyYml",
                 testInstallMustRemoveThoseHooksThatAreNoLongerPresentInShuskyYml
             ),
@@ -95,6 +100,7 @@
                 testRunUninstallDoesNotFailIfNotContainsShuskyRunCommand
             ),
             ("testRunUninstallWithPackagePath", testRunUninstallWithPackagePath),
+            ("testRunVerboseFalse", testRunVerboseFalse),
         ]
     }
 
@@ -120,17 +126,12 @@
             ("testHookIsEmpty", testHookIsEmpty),
             ("testHookNotFound", testHookNotFound),
             ("testIfVerboseIsNotDefinedIsSetTrueByDefault", testIfVerboseIsNotDefinedIsSetTrueByDefault),
-            ("testInvalidCommand", testInvalidCommand),
             ("testInvalidCommandInHook", testInvalidCommandInHook),
             ("testInvalidRunInHook", testInvalidRunInHook),
             ("testInvalidTypeInHookVerboseKey", testInvalidTypeInHookVerboseKey),
             ("testRunCommand", testRunCommand),
             ("testRunCritical", testRunCritical),
-            ("testRunInvalidCommand", testRunInvalidCommand),
-            ("testRunInvalidDataInCommand", testRunInvalidDataInCommand),
-            ("testRunInvalidDataInCritical", testRunInvalidDataInCritical),
             ("testRunInvalidDataInPath", testRunInvalidDataInPath),
-            ("testRunInvalidDataInVerbose", testRunInvalidDataInVerbose),
             ("testRunPath", testRunPath),
             ("testRunVerbose", testRunVerbose),
             ("testRunWithCommandDefined", testRunWithCommandDefined),

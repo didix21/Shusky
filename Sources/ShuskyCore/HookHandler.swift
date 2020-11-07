@@ -4,41 +4,11 @@
 
 import Files
 import Foundation
-
-public enum ANSIColors: String {
-    case black = "\u{001B}[0;30m"
-    case red = "\u{001B}[0;31m"
-    case green = "\u{001B}[0;32m"
-    case yellow = "\u{001B}[0;33m"
-    case blue = "\u{001B}[0;34m"
-    case magenta = "\u{001B}[0;35m"
-    case cyan = "\u{001B}[0;36m"
-    case white = "\u{001B}[0;37m"
-
-    func name() -> String {
-        switch self {
-        case .black: return "Black"
-        case .red: return "Red"
-        case .green: return "Green"
-        case .yellow: return "Yellow"
-        case .blue: return "Blue"
-        case .magenta: return "Magenta"
-        case .cyan: return "Cyan"
-        case .white: return "White"
-        }
-    }
-
-    static func all() -> [ANSIColors] {
-        [.black, .red, .green, .yellow, .blue, .magenta, .cyan, .white]
-    }
-}
+import Rainbow
 
 protocol Printable {
     func print(_ str: Any)
     func print(_ str: Any, terminator: String)
-    func printState(_ commandState: HookHandler.CommandState, _ command: Command)
-    func printc(_ color: ANSIColors, _ str: Any)
-    func printc(_ color: ANSIColors, _ str: Any, terminator: String)
 }
 
 class Printer: Printable {
@@ -48,28 +18,6 @@ class Printer: Printable {
 
     func print(_ str: Any, terminator: String) {
         Swift.print(str, terminator: terminator)
-    }
-
-    func printState(_ commandState: HookHandler.CommandState, _ command: Command) {
-        let runCommand = command.run.command
-        switch commandState {
-        case .running:
-            printc(.white, commandState.describe(runCommand))
-        case .success:
-            printc(.green, commandState.describe(runCommand))
-        case .error:
-            printc(.red, commandState.describe(runCommand))
-        case .isNotCritical:
-            printc(.yellow, commandState.describe(runCommand))
-        }
-    }
-
-    func printc(_ color: ANSIColors, _ str: Any) {
-        Swift.print(color.rawValue + "\(str)")
-    }
-
-    func printc(_ color: ANSIColors, _ str: Any, terminator: String) {
-        Swift.print(color.rawValue + "\(str)", terminator: terminator)
     }
 }
 
@@ -96,14 +44,14 @@ final class HookHandler {
     public func run() -> Int32 {
         guard !isSkipEnabled() else { return 0 }
         for command in hook.commands {
-            printer.printState(.running, command)
+            printer.print(CommandState.running(command))
             let result = getResult(command: command)
             switch result {
-            case let .error(errorCode):
-                printer.printState(result, command)
+            case let .error(_, errorCode):
+                printer.print(result)
                 return errorCode
             default:
-                printer.printState(result, command)
+                printer.print(result)
             }
         }
 
@@ -142,16 +90,16 @@ final class HookHandler {
                     printer.print(stdout)
                 }
                 if let stderr = getStdErr() {
-                    printer.printc(.red, stderr)
+                    printer.print(stderr)
                 }
             }
             if !isCritical(command: command) {
-                return .isNotCritical(errorCode: result.status)
+                return .isNotCritical(command, errorCode: result.status)
             }
-            return .error(errorCode: result.status)
+            return .error(command, errorCode: result.status)
         }
 
-        return .success
+        return .success(command)
     }
 
     private func getStdErr() -> String? {
@@ -201,22 +149,22 @@ final class HookHandler {
         getenv(param.rawValue)
     }
 
-    enum CommandState {
-        case running
-        case success
-        case error(errorCode: Int32)
-        case isNotCritical(errorCode: Int32)
+    enum CommandState: CustomStringConvertible {
+        case running(Command)
+        case success(Command)
+        case error(Command, errorCode: Int32)
+        case isNotCritical(Command, errorCode: Int32)
 
-        func describe(_ command: String) -> String {
+        var description: String {
             switch self {
-            case .running:
+            case let .running(command):
                 return "⏳ Running \(command)"
-            case .success:
-                return "✔ \(command) has successfully executed\n"
-            case let .error(errorCode):
-                return "❌ \(command) has failed with error \(errorCode)\n"
-            case let .isNotCritical(errorCode):
-                return "⚠️ \(command) has failed with error \(errorCode)\n"
+            case let .success(command):
+                return " ✔".green + " \(command) \("has been successfully executed".green)\n"
+            case let .error(command, errorCode):
+                return "❌  \(command) \("has failed with error \(errorCode)".red)\n"
+            case let .isNotCritical(command, errorCode):
+                return "⚠️  \(command) \("has failed with error \(errorCode)".yellow)\n"
             }
         }
     }

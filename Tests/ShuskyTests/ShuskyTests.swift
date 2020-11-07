@@ -103,7 +103,7 @@ final class ShuskyTests: XCTestCase {
         _ = shell.execute("git init")
 
         XCTAssertEqual(runShusky(subcommand: "install --all").status, 0)
-        for hook in HookType.getAll() {
+        for hook in HookType.allCases {
             let rawValue = hook.rawValue
             XCTAssertEqual(try File(path: gitPath + rawValue).readAsString(), swiftRun(hookType: rawValue))
         }

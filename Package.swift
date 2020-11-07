@@ -3,6 +3,7 @@
 
 import PackageDescription
 
+let commonLibraries: [Target.Dependency] = ["Yams", "Files", "Rainbow"]
 let package = Package(
     name: "Shusky",
     products: [
@@ -12,23 +13,19 @@ let package = Package(
         .package(url: "https://github.com/jpsim/Yams.git", from: "2.0.0"),
         .package(url: "https://github.com/JohnSundell/Files", from: "4.1.1"),
         .package(url: "https://github.com/apple/swift-argument-parser", from: "0.0.1"),
+        .package(url: "https://github.com/onevcat/Rainbow", from: "3.0.0"),
     ],
     targets: [
         .target(
             name: "Shusky",
-            dependencies: [
+            dependencies: commonLibraries + [
                 "ShuskyCore",
-                "Yams",
-                "Files",
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
             ]
         ),
         .target(
             name: "ShuskyCore",
-            dependencies: [
-                "Yams",
-                "Files",
-            ]
+            dependencies: commonLibraries
         ),
         .testTarget(
             name: "ShuskyTests",
@@ -39,11 +36,7 @@ let package = Package(
         ),
         .testTarget(
             name: "ShuskyCoreTests",
-            dependencies: [
-                "ShuskyCore",
-                "Yams",
-                "Files",
-            ]
+            dependencies: ["ShuskyCore"] + commonLibraries
         ),
     ],
     swiftLanguageVersions: [

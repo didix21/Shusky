@@ -4,17 +4,21 @@
 
 import Files
 import Foundation
+import Rainbow
 @testable import ShuskyCore
 import XCTest
 
 final class HookHandlerTests: XCTestCase {
-    let echo = "echo \"Shusky is ready, please configure .shusky.yml\""
+    let echo = "echo \"Shusky is ready, please configure .shusky.yml\"".magenta
+    let check = " ✔".green
+    lazy var running: String = { "⏳ Running \(echo)" }()
+    lazy var successFullyExecuted: String = { "\(check) \(echo) \("has been successfully executed".green)\n\n" }()
 
     func testCommandHandler() {
         let consoleResult = """
-        \(ANSIColors.white.rawValue)⏳ Running \(echo)
+        \(running)
         Shusky is ready, please configure .shusky.yml
-        \(ANSIColors.green.rawValue)✔ \(echo) has successfully executed\n\n
+        \(successFullyExecuted)
         """
         let hook = Hook(
             hookType: .preCommit,
@@ -34,8 +38,8 @@ final class HookHandlerTests: XCTestCase {
 
     func testCommandHandlerGlobalVerboseFalse() {
         let consoleResult = """
-        \(ANSIColors.white.rawValue)⏳ Running \(echo)
-        \(ANSIColors.green.rawValue)✔ \(echo) has successfully executed\n\n
+        \(running)
+        \(successFullyExecuted)
         """
         let hook = Hook(
             hookType: .preCommit,
@@ -55,9 +59,9 @@ final class HookHandlerTests: XCTestCase {
 
     func testLocalVerboseTrueAndGlobalVerboseFalse() {
         let consoleResult = """
-        \(ANSIColors.white.rawValue)⏳ Running \(echo)
+        \(running)
         Shusky is ready, please configure .shusky.yml
-        \(ANSIColors.green.rawValue)✔ \(echo) has successfully executed\n\n
+        \(successFullyExecuted)
         """
         let hook = Hook(
             hookType: .preCommit,
@@ -81,8 +85,8 @@ final class HookHandlerTests: XCTestCase {
 
     func testLocalVerboseFalseAndGlobalVerboseTrue() {
         let consoleResult = """
-        \(ANSIColors.white.rawValue)⏳ Running \(echo)
-        \(ANSIColors.green.rawValue)✔ \(echo) has successfully executed\n\n
+        \(running)
+        \(successFullyExecuted)
         """
         let hook = Hook(
             hookType: .preCommit,
@@ -106,9 +110,9 @@ final class HookHandlerTests: XCTestCase {
 
     func testLocalVerboseTrueAndGlobalVerboseTrue() {
         let consoleResult = """
-        \(ANSIColors.white.rawValue)⏳ Running \(echo)
+        \(running)
         Shusky is ready, please configure .shusky.yml
-        \(ANSIColors.green.rawValue)✔ \(echo) has successfully executed\n\n
+        \(successFullyExecuted)
         """
         let hook = Hook(
             hookType: .preCommit,
@@ -127,9 +131,9 @@ final class HookHandlerTests: XCTestCase {
 
     func testIfVerboseIsSetFalseAndCommandFailsDisplayResult() {
         let consoleResult = """
-        \(ANSIColors.white.rawValue)⏳ Running \(echo)
+        \(running)
         Shusky is ready, please configure .shusky.yml
-        \(ANSIColors.red.rawValue)❌ \(echo) has failed with error 32\n\n
+        \("❌  \(echo) \("has failed with error 32".red)")\n\n
         """
         let hook = Hook(
             hookType: .preCommit,
@@ -150,9 +154,9 @@ final class HookHandlerTests: XCTestCase {
 
     func testCommandFails() {
         let consoleResult = """
-        \(ANSIColors.white.rawValue)⏳ Running \(echo)
+        \(running)
         Shusky is ready, please configure .shusky.yml
-        \(ANSIColors.red.rawValue)❌ \(echo) has failed with error 32\n\n
+        \("❌  \(echo) \("has failed with error 32".red)")\n\n
         """
         let hook = Hook(
             hookType: .preCommit,
@@ -173,9 +177,9 @@ final class HookHandlerTests: XCTestCase {
 
     func testCommandFailsButIsDefinedAsNonCritical() {
         let consoleResult = """
-        \(ANSIColors.white.rawValue)⏳ Running \(echo)
+        \(running)
         Shusky is ready, please configure .shusky.yml
-        \(ANSIColors.yellow.rawValue)⚠️ \(echo) has failed with error 32\n\n
+        \("⚠️  \(echo) \("has failed with error 32".yellow)")\n\n
         """
         let hook = Hook(
             hookType: .preCommit,
