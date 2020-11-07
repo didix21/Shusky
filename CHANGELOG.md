@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.2.0](https://github.com/didix21/Shusky/tree/1.2.0) (2020-11-07)
+
+[Full Changelog](https://github.com/didix21/Shusky/compare/1.1.0...1.2.0)
+
+**Implemented enhancements:**
+
+- Update Shusky's dependencies and BuildTools [\#40](https://github.com/didix21/Shusky/issues/40)
+- Improve how information is printed in console [\#39](https://github.com/didix21/Shusky/issues/39)
+- \[\#39\] Improve how information is printed in console [\#41](https://github.com/didix21/Shusky/pull/41) ([didix21](https://github.com/didix21))
+
+**Merged pull requests:**
+
+- 40 update dependencies and buildtools [\#42](https://github.com/didix21/Shusky/pull/42) ([didix21](https://github.com/didix21))
+
 ## [1.1.0](https://github.com/didix21/Shusky/tree/1.1.0) (2020-06-19)
 
 [Full Changelog](https://github.com/didix21/Shusky/compare/1.0.0...1.1.0)
