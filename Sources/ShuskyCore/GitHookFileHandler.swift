@@ -66,7 +66,8 @@ class GitHookFileHandler: Writable, Readable {
             return
         }
         guard let startIndex = content.index(of: hookCommand()),
-            let endIndex = content.endIndex(of: hookCommand()) else {
+              let endIndex = content.endIndex(of: hookCommand())
+        else {
             return
         }
 
@@ -77,7 +78,8 @@ class GitHookFileHandler: Writable, Readable {
 
     private func getPackagePath(_ content: String) -> String? {
         guard let startIndex = content.endIndex(of: "\(swiftRunWithPath) "),
-            let endIndex = content.index(of: " \(shuskyRun) \(hook.rawValue)\n") else {
+              let endIndex = content.index(of: " \(shuskyRun) \(hook.rawValue)\n")
+        else {
             return nil
         }
         return String(content[startIndex ... content.index(before: endIndex)])

@@ -66,11 +66,12 @@ final class HookHandlerTests: XCTestCase {
         let hook = Hook(
             hookType: .preCommit,
             verbose: false,
-            commands: [Command(run: Run(
-                command: "echo \"Shusky is ready, please configure .shusky.yml\"",
-                verbose: true
-            )
-                )]
+            commands: [Command(
+                run: Run(
+                    command: "echo \"Shusky is ready, please configure .shusky.yml\"",
+                    verbose: true
+                )
+            )]
         )
         let printerMock = PrinterMock()
         let commandHandler = HookHandler(
@@ -91,11 +92,12 @@ final class HookHandlerTests: XCTestCase {
         let hook = Hook(
             hookType: .preCommit,
             verbose: true,
-            commands: [Command(run: Run(
-                command: "echo \"Shusky is ready, please configure .shusky.yml\"",
-                verbose: false
-            )
-                )]
+            commands: [Command(
+                run: Run(
+                    command: "echo \"Shusky is ready, please configure .shusky.yml\"",
+                    verbose: false
+                )
+            )]
         )
         let printerMock = PrinterMock()
         let commandHandler = HookHandler(
