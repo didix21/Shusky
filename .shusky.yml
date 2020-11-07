@@ -9,4 +9,5 @@ pre-commit:
     - run:
         command: swift run -c release --package-path BuildTools swiftlint lint --strict .
         verbose: false
+        critical: true
     - git add -A

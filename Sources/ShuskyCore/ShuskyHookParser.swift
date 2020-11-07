@@ -18,23 +18,23 @@ extension Yamable {
     }
 }
 
-public enum ShuskyParserError: Error, Equatable, Describable {
+public enum ShuskyParserError: Error, Equatable, CustomStringConvertible {
     case shuskyConfigIsEmpty
     case isNotDict
     case noHooksFound
     case invalidHook(Hook.HookError)
 
-    public func description() -> String {
+    public var description: String {
         let shusky = ".shusky.yml file"
         switch self {
         case .shuskyConfigIsEmpty:
-            return "☣️ \(shusky) is empty!"
+            return "☣️  \(shusky) is empty!"
         case .isNotDict:
-            return "☣️ \(shusky) hasn't the expected format!"
+            return "☣️  \(shusky) hasn't the expected format!"
         case .noHooksFound:
-            return "☣️ There isn't any hook in \(shusky)!"
+            return "☣️  There isn't any hook in \(shusky)!"
         case let .invalidHook(error):
-            return "☣️ In \(shusky) there is an invalid \(error.description())!"
+            return "☣️  In \(shusky) there is an invalid \(error)!"
         }
     }
 }
@@ -72,7 +72,7 @@ class ShuskyHooksParser: Yamable {
     private func parse() throws {
         let data = try load(yaml)
 
-        for hookType in HookType.getAll() {
+        for hookType in HookType.allCases {
             guard (data[hookType.rawValue] as? [Any]) != nil else { continue }
             availableHooks.append(hookType)
         }

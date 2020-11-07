@@ -5,11 +5,7 @@
 import Foundation
 import Yams
 
-public protocol Describable {
-    func description() -> String
-}
-
-public enum HookType: String {
+public enum HookType: String, CaseIterable {
     case applypatchMsg = "applypatch-msg"
     case preApplyPatch = "pre-applypatch"
     case postApplyPatch = "post-applypatch"
@@ -22,23 +18,6 @@ public enum HookType: String {
     case postCheckout = "post-checkout"
     case postMerge = "post-merge"
     case prePush = "pre-push"
-
-    public static func getAll() -> [HookType] {
-        [
-            .applypatchMsg,
-            .preApplyPatch,
-            .postApplyPatch,
-            .preCommit,
-            .preMergeCommit,
-            .prepareCommitMsg,
-            .commitMsg,
-            .postCommit,
-            .preRebase,
-            .postCheckout,
-            .postMerge,
-            .prePush,
-        ]
-    }
 }
 
 public struct Hook: Equatable {
@@ -71,7 +50,16 @@ public struct Hook: Equatable {
 
         for command in hook {
             do {
-                commands.append(try Command.parse(command))
+                if let command = command as? String {
+                    commands.append(Command(run: Run(command: command)))
+                    continue
+                }
+
+                guard let dict = command as? [String: [String: Any]] else {
+                    throw Command.CommandError.invalidRun
+                }
+                let json = try JSONSerialization.data(withJSONObject: dict)
+                commands.append(try JSONDecoder().decode(Command.self, from: json))
             } catch let error as Command.CommandError {
                 throw HookError.invalidCommand(hookType, error)
             }
@@ -90,13 +78,13 @@ public struct Hook: Equatable {
         case verbose
     }
 
-    public enum HookError: Error, Equatable, Describable {
+    public enum HookError: Error, Equatable, CustomStringConvertible {
         case noHookFound
         case hookIsEmpty(HookType)
         case invalidTypeInHookKey(ShuskyCodingKey, String)
         case invalidCommand(HookType, Command.CommandError)
 
-        public func description() -> String {
+        public var description: String {
             switch self {
             case .noHookFound:
                 return "no hook found"
@@ -105,33 +93,17 @@ public struct Hook: Equatable {
             case let .invalidTypeInHookKey(key, content):
                 return "invalid type in \(key.rawValue): \(content)"
             case let .invalidCommand(hook, error):
-                return "invalid command in \(hook.rawValue): \(error.description())"
+                return "invalid command in \(hook.rawValue): \(error)"
             }
         }
     }
 }
 
-public struct Command: Equatable {
+public struct Command: Equatable, Decodable {
     public var run: Run
 
-    public static func parse(_ data: Any) throws -> Command {
-        if let command = data as? String {
-            return Command(run: Run(command: command))
-        }
-
-        guard let dict = data as? [String: Any] else {
-            throw CommandError.invalidData("\(data)")
-        }
-
-        if let run = dict[ShuskyCoddingKeys.run.rawValue] {
-            do {
-                return try Command(run: Run.parse(run))
-            } catch let error as Run.RunError {
-                throw CommandError.invalidRun(ShuskyCoddingKeys.run, error)
-            }
-        }
-
-        throw CommandError.noCommands
+    public init(run: Run) {
+        self.run = run
     }
 
     public static func == (lhs: Command, rhs: Command) -> Bool {
@@ -142,129 +114,48 @@ public struct Command: Equatable {
         case run
     }
 
-    public enum CommandError: Error, Equatable, Describable {
+    public enum CommandError: Error, Equatable, CustomStringConvertible {
         case invalidData(String)
         case noCommands
-        case invalidRun(ShuskyCoddingKeys, Run.RunError)
+        case invalidRun
 
-        public func description() -> String {
+        public var description: String {
             switch self {
             case let .invalidData(data):
                 return "invalid data: \(data)"
             case .noCommands:
                 return "has any command"
-            case let .invalidRun(key, error):
-                return "invalid \(key): \(error.description())"
+            case .invalidRun:
+                return "invalid run"
             }
         }
     }
 }
 
-public struct Run: Equatable {
+extension Command: CustomStringConvertible {
+    public var description: String {
+        run.description.magenta
+    }
+}
+
+public struct Run: Equatable, Decodable {
     public var command: String
     public var path: String?
     public var critical: Bool?
     public var verbose: Bool?
 
-    public static func parse(_ data: Any) throws -> Run {
-        guard let runContent = data as? [String: Any] else {
-            throw RunError.invalidData("\(data)")
-        }
-
-        return try parse(data: runContent)
-    }
-
-    public static func parse(data: [String: Any]) throws -> Run {
-        var values: [(ShuskyCodingKey, Any)] = []
-        for key in ShuskyCodingKey.getAllKeys() {
-            guard let value = data[key.rawValue] else { continue }
-            values.append((key, value))
-        }
-
-        return try ShuskyCodingType.mapTo(ShuskyCodingKey.mapTo(values))
-    }
-
-    public enum ShuskyCodingKey: String {
+    public enum ShuskyCodingKey: String, CaseIterable {
         case command
         case path
         case critical
         case verbose
-
-        public static func getAllKeys() -> [ShuskyCodingKey] {
-            [.command, .path, .critical, .verbose]
-        }
-
-        public static func mapTo(_ keys: [(ShuskyCodingKey, Any)]) throws -> [ShuskyCodingType] {
-            var shuskyTypes: [ShuskyCodingType] = []
-            for (key, value) in keys {
-                switch key {
-                case .command:
-                    let value = try key.tryString(value)
-                    shuskyTypes.append(.command(value))
-                case .path:
-                    let value = try key.tryString(value)
-                    shuskyTypes.append(.path(value))
-                case .critical:
-                    let value = try key.tryBool(value)
-                    shuskyTypes.append(.critical(value))
-                case .verbose:
-                    let value = try key.tryBool(value)
-                    shuskyTypes.append(.verbose(value))
-                }
-            }
-
-            return shuskyTypes
-        }
-
-        private func tryString(_ value: Any) throws -> String {
-            guard let val = value as? String else {
-                throw RunError.invalidTypeInRunKey(self, "\(value)")
-            }
-            return val
-        }
-
-        private func tryBool(_ value: Any) throws -> Bool {
-            guard let val = value as? Bool else {
-                throw RunError.invalidTypeInRunKey(self, "\(value)")
-            }
-            return val
-        }
     }
 
-    public enum ShuskyCodingType {
-        case command(String)
-        case path(String?)
-        case critical(Bool?)
-        case verbose(Bool?)
-
-        public static func mapTo(_ keys: [ShuskyCodingType]) throws -> Run {
-            var optCommand: String?
-            var path: String?
-            var critical: Bool?
-            var verbose: Bool?
-
-            for key in keys {
-                switch key {
-                case let .command(value): optCommand = value
-                case let .path(value): path = value
-                case let .critical(value): critical = value
-                case let .verbose(value): verbose = value
-                }
-            }
-
-            guard let command = optCommand else {
-                throw RunError.invalidTypeInRunKey(.command, "\(String(describing: optCommand))")
-            }
-
-            return Run(command: command, path: path, critical: critical, verbose: verbose)
-        }
-    }
-
-    public enum RunError: Error, Equatable, Describable {
+    public enum RunError: Error, Equatable, CustomStringConvertible {
         case invalidData(String)
         case invalidTypeInRunKey(ShuskyCodingKey, String)
 
-        public func description() -> String {
+        public var description: String {
             switch self {
             case let .invalidData(data):
                 return "invalid data: \(data)"
@@ -278,5 +169,11 @@ public struct Run: Equatable {
         lhs.command == rhs.command &&
             lhs.path == rhs.path &&
             lhs.critical == rhs.critical
+    }
+}
+
+extension Run: CustomStringConvertible {
+    public var description: String {
+        command
     }
 }

@@ -3,6 +3,7 @@
 //
 
 import Foundation
+import Rainbow
 import Yams
 
 public final class ShuskyCore {
@@ -20,19 +21,20 @@ public final class ShuskyCore {
             return executeCommand(hook: hook)
 
         } catch let error as ShuskyParserError {
+            let errorDescription = error.description.red
             switch error {
             case let .invalidHook(hookError):
                 switch hookError {
                 case .noHookFound:
                     return 0
                 default:
-                    printer.printc(.red, error.description())
+                    printer.print(errorDescription)
                 }
             default:
-                printer.printc(.red, error.description())
+                printer.print(errorDescription)
             }
         } catch {
-            printer.printc(.red, error)
+            printer.print("\(error)".red)
         }
 
         return 1
@@ -63,9 +65,9 @@ public final class ShuskyCore {
             return 0
 
         } catch let error as ShuskyParserError {
-            printer.printc(.red, error.description())
+            printer.print(error.description.red)
         } catch {
-            printer.printc(.red, "Unexpected error: \(error)")
+            printer.print("Unexpected error: \(error)".red)
         }
 
         return 1
@@ -89,7 +91,7 @@ public final class ShuskyCore {
             try gitHookFileHandler.addHook()
         }
 
-        for hookNotAvailable in HookType.getAll() where !hooksParser.availableHooks.contains(hookNotAvailable) {
+        for hookNotAvailable in HookType.allCases where !hooksParser.availableHooks.contains(hookNotAvailable) {
             let gitHookFileHandler = GitHookFileHandler(
                 hook: hookNotAvailable,
                 path: gitPath
@@ -99,7 +101,7 @@ public final class ShuskyCore {
     }
 
     private func installAll(gitPath: String, packagePath: String?, overwrite: Bool) throws {
-        for hook in HookType.getAll() {
+        for hook in HookType.allCases {
             let gitHookFileHandler = GitHookFileHandler(
                 hook: hook,
                 path: gitPath,
@@ -116,7 +118,7 @@ public final class ShuskyCore {
     }
 
     public func uninstall(gitPath: String) -> Int32 {
-        for hook in HookType.getAll() {
+        for hook in HookType.allCases {
             let gitHookFileHandler = GitHookFileHandler(hook: hook, path: gitPath)
             do {
                 try gitHookFileHandler.deleteHook()
