@@ -20,7 +20,7 @@ struct Shusky: ParsableCommand {
         NOTE: To skip any git hook execution run: 'SKIP_SHUSKY=1 <git command>'.
               For example, to skip pre-push run: 'SKIP_SHUSKY=1 git push'.
         """,
-        version: "1.1.0",
+        version: "1.2.1",
         subcommands: [Install.self, Run.self, Uninstall.self]
     )
 
@@ -34,10 +34,10 @@ struct Shusky: ParsableCommand {
         var packagePath: String?
 
         @Flag(help: "Use this flag for installing all git hooks.")
-        var all: Bool
+        var all: Bool = false
 
         @Flag(help: "Use this flag for letting shusky overwrite any hook file that already exists.")
-        var overwrite: Bool
+        var overwrite: Bool = false
 
         func run() throws {
             let shuskyCore = ShuskyCore()
