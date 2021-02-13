@@ -9,10 +9,12 @@ import Rainbow
 import XCTest
 
 final class HookHandlerTests: XCTestCase {
-    let echo = "echo \"Shusky is ready, please configure .shusky.yml\"".magenta
-    let check = " ✔".green
-    lazy var running: String = { "⏳ Running \(echo)" }()
-    lazy var successFullyExecuted: String = { "\(check) \(echo) \("has been successfully executed".green)\n\n" }()
+    private let echo = "echo \"Shusky is ready, please configure .shusky.yml\"".magenta
+    private let check = " ✔".green
+    private lazy var running: String = { "⏳ Running \(echo)" }()
+    private lazy var successFullyExecuted: String = {
+        "\(check) \(echo) \("has been successfully executed".green)\n\n"
+    }()
 
     func testCommandHandler() {
         let consoleResult = """

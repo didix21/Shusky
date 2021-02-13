@@ -1,6 +1,21 @@
 
 jobs:
   include:
+    - stage: OSX test and build xcode12
+      os: osx
+      osx_image: xcode12.3
+      language: objective-c
+      cache:
+        directories:
+          - $HOME/travis/.rvm/
+      before_install:
+        - gem install xcpretty
+      script:
+        - swift run --skip-update -c release --package-path BuildTools swiftformat --lint .
+        - swift run --skip-update -c release --package-path BuildTools swiftlint lint --strict .
+        - swift run --skip-update -c release --package-path BuildTools periphery scan
+        - set -o pipefail && swift test 2>&1 | xcpretty --color
+        - swift build -c release
     - stage: OSX test and build xcode11
       os: osx
       osx_image: xcode11.5
@@ -12,27 +27,10 @@ jobs:
       before_install:
         - gem install xcpretty
       script:
-        - ./scripts/swiftpackage -c "swiftformat --lint ."
-        - ./scripts/swiftpackage -c "swiftlint lint --strict ."
         - set -o pipefail && swift test --enable-code-coverage 2>&1 | xcpretty --color
         - swift build -c release
         - xcrun llvm-cov export -format="lcov" .build/debug/ShuskyPackageTests.xctest/Contents/MacOS/ShuskyPackageTests -instr-profile .build/debug/codecov/default.profdata > info.lcov
         - bash <(curl https://codecov.io/bash)
-    - stage: OSX test and build last
-      os: osx
-      osx_image: xcode12
-      language: objective-c
-      cache:
-        directories:
-          - $HOME/travis/.rvm/
-          - BuildTools/
-      before_install:
-        - gem install xcpretty
-      script:
-        - ./scripts/swiftpackage -c "swiftformat --lint ."
-        - ./scripts/swiftpackage -c "swiftlint lint --strict ."
-        - set -o pipefail && swift test 2>&1 | xcpretty --color
-        - swift build -c release
     - stage: linux test
       os: linux
       dist: bionic
@@ -48,8 +46,6 @@ jobs:
         - gem install xcpretty
       script:
         - export PATH="${PWD}/swift-5.2-RELEASE-ubuntu18.04/usr/bin:$PATH"
-        - python3 ./scripts/swiftpackage -c "swiftformat --lint ."
-        - python3 ./scripts/swiftpackage -c "swiftlint lint --strict ."
         - set -o pipefail && swift test 2>&1 | xcpretty --color
         - swift build -c release
 

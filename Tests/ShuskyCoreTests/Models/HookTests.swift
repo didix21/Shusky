@@ -11,17 +11,6 @@ import XCTest
 import Yams
 
 class HookTests: XCTestCase {
-    let yamsEncoder = YAMLEncoder()
-
-    func getYamlContent(_ config: String) -> Any {
-        guard let yaml = try? Yams.load(yaml: config) else { fatalError() }
-        return yaml
-    }
-
-    func genHookConfig(_ config: [HookConfigTests]) -> String {
-        HookConfigTests.mapToStr(config)
-    }
-
     func testInvalidCommandInHook() throws {
         let config = """
         pre-commit:

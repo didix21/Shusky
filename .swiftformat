@@ -1,4 +1,4 @@
---exclude .build, BuildTools/.build
+--exclude .build, BuildTools/.build, **/XCTestManifests.swift
 --wraparguments before-first
 --wrapcollections before-first
 --disable trailingClosures

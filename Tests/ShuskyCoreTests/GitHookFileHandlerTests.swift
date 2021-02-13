@@ -8,29 +8,27 @@ import Foundation
 import XCTest
 
 final class GitHookFileHandlerTests: XCTestCase {
-    let tmpFolder = Folder.temporary
-    var testFolder: Folder!
-    var shuskyFile: ShuskyFile!
-    let gitPath = "GitPathTests"
-    let path = ".git/hooks/"
+    private let tmpFolder = Folder.temporary
+    private var testFolder: Folder!
+    private let gitPath = "GitPathTests"
+    private let path = ".git/hooks/"
 
-    override func setUp() {
-        shuskyFile = ShuskyFile()
+    override func setUpWithError() throws {
         // Setup a temp test folder that can be used as a sandbox
-        testFolder = try! tmpFolder.createSubfolderIfNeeded(
+        testFolder = try tmpFolder.createSubfolderIfNeeded(
             withName: gitPath
         )
         // Empty the test folder to ensure a clean state
-        try! testFolder.empty(includingHidden: true)
-        try! testFolder.createSubfolder(at: path)
+        try testFolder.empty(includingHidden: true)
+        try testFolder.createSubfolder(at: path)
 
         // Make the temp folder the current working folder
         let fileManager = FileManager.default
         fileManager.changeCurrentDirectoryPath(testFolder.path)
     }
 
-    override func tearDown() {
-        try! testFolder.empty()
+    override func tearDownWithError() throws {
+        try testFolder.empty()
     }
 
     func testCreateHookFileIfNotExists() throws {
