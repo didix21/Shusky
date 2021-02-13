@@ -77,7 +77,7 @@ class ShuskyHooksParser: Yamable {
             availableHooks.append(hookType)
         }
 
-        guard !availableHooks.isEmpty else {
+        if availableHooks.isEmpty {
             throw ShuskyParserError.noHooksFound
         }
     }
