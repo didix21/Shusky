@@ -1,9 +1,11 @@
 //
-// Created by Dídac Coll Pujals on 11/05/2020.
+//  Hook.swift
+//  ShuskyCore
+//
+//  Created by Dídac Coll Pujals on 13/2/21.
 //
 
 import Foundation
-import Yams
 
 public enum HookType: String, CaseIterable {
     case applypatchMsg = "applypatch-msg"
@@ -96,84 +98,5 @@ public struct Hook: Equatable {
                 return "invalid command in \(hook.rawValue): \(error)"
             }
         }
-    }
-}
-
-public struct Command: Equatable, Decodable {
-    public var run: Run
-
-    public init(run: Run) {
-        self.run = run
-    }
-
-    public static func == (lhs: Command, rhs: Command) -> Bool {
-        lhs.run == rhs.run
-    }
-
-    public enum ShuskyCoddingKeys: String {
-        case run
-    }
-
-    public enum CommandError: Error, Equatable, CustomStringConvertible {
-        case invalidData(String)
-        case noCommands
-        case invalidRun
-
-        public var description: String {
-            switch self {
-            case let .invalidData(data):
-                return "invalid data: \(data)"
-            case .noCommands:
-                return "has any command"
-            case .invalidRun:
-                return "invalid run"
-            }
-        }
-    }
-}
-
-extension Command: CustomStringConvertible {
-    public var description: String {
-        run.description.magenta
-    }
-}
-
-public struct Run: Equatable, Decodable {
-    public var command: String
-    public var path: String?
-    public var critical: Bool?
-    public var verbose: Bool?
-
-    public enum ShuskyCodingKey: String, CaseIterable {
-        case command
-        case path
-        case critical
-        case verbose
-    }
-
-    public enum RunError: Error, Equatable, CustomStringConvertible {
-        case invalidData(String)
-        case invalidTypeInRunKey(ShuskyCodingKey, String)
-
-        public var description: String {
-            switch self {
-            case let .invalidData(data):
-                return "invalid data: \(data)"
-            case let .invalidTypeInRunKey(key, content):
-                return "invalid type in \(key): \(content)"
-            }
-        }
-    }
-
-    public static func == (lhs: Run, rhs: Run) -> Bool {
-        lhs.command == rhs.command &&
-            lhs.path == rhs.path &&
-            lhs.critical == rhs.critical
-    }
-}
-
-extension Run: CustomStringConvertible {
-    public var description: String {
-        command
     }
 }

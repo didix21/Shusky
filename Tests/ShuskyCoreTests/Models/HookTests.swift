@@ -1,19 +1,16 @@
 //
-// Created by Dídac Coll Pujals on 11/05/2020.
+//  HookTests.swift
+//  ShuskyCoreTests
+//
+//  Created by Dídac Coll Pujals on 13/2/21.
 //
 
-import Files
 import Foundation
 @testable import ShuskyCore
 import XCTest
 import Yams
 
-final class ShuskyModelsTests: XCTestCase {
-    let preCommit = "pre-commit:"
-    let echo = "echo \"print with bash\""
-    let path = "./This/path"
-    var critical = true
-    var verbose = true
+class HookTests: XCTestCase {
     let yamsEncoder = YAMLEncoder()
 
     func getYamlContent(_ config: String) -> Any {
@@ -23,93 +20,6 @@ final class ShuskyModelsTests: XCTestCase {
 
     func genHookConfig(_ config: [HookConfigTests]) -> String {
         HookConfigTests.mapToStr(config)
-    }
-
-    func genRunConfig(_ config: [RunConfigTests]) -> String {
-        RunConfigTests.mapToStr(config)
-    }
-
-    func testRunCommand() throws {
-        let config = """
-        command: swift run shusky install
-        """
-        let run = try YAMLDecoder().decode(Run.self, from: config)
-        XCTAssertEqual(run, Run(command: "swift run shusky install"))
-    }
-
-    func testRunInvalidDataInPath() throws {
-        let config = """
-        command: swift run shusky install
-        path: true
-        """
-        do {
-            _ = try YAMLDecoder().decode(Run.self, from: config)
-        } catch let error as DecodingError {
-            switch error {
-            case .typeMismatch:
-                break
-            default:
-                XCTFail("Expected DecodingError.typeMismatch but got \(error)")
-            }
-        }
-    }
-
-    func testRunPath() throws {
-        let config = """
-        command: swift run shusky install
-        path: ./my/path
-        """
-        let run = try YAMLDecoder().decode(Run.self, from: config)
-        XCTAssertEqual(run, Run(command: "swift run shusky install", path: "./my/path"))
-    }
-
-    func testRunCritical() throws {
-        let config = """
-        command: swift run shusky install
-        critical: false
-        """
-        let run = try YAMLDecoder().decode(Run.self, from: config)
-        XCTAssertEqual(run, Run(command: "swift run shusky install", critical: false))
-    }
-
-    func testRunVerbose() throws {
-        let config = """
-        command: swift run shusky install
-        verbose: true
-        """
-        let run = try YAMLDecoder().decode(Run.self, from: config)
-        XCTAssertEqual(run, Run(command: "swift run shusky install", verbose: true))
-    }
-
-    func testRunWithInvalidTypeCommand() throws {
-        let config = genRunConfig([.command(true)])
-        do {
-            let json = try JSONSerialization.data(withJSONObject: getYamlContent(config))
-            _ = try JSONDecoder().decode(Command.self, from: json)
-        } catch {
-            XCTAssertNotNil(error)
-        }
-    }
-
-    func testRunWithCommandDefined() throws {
-        let config = genRunConfig([.command(echo)])
-        let command = Command(run: Run(command: echo))
-        let actualCommand = try YAMLDecoder().decode(Command.self, from: config)
-        XCTAssertEqual(actualCommand, command)
-    }
-
-    func testRunWithCommandPathCriticalDefined() throws {
-        let config = genRunConfig([.command(echo), .path(path), .critical(critical)])
-        let command = Command(run: Run(command: echo, path: path, critical: critical))
-        let actualCommand = try YAMLDecoder().decode(Command.self, from: config)
-        XCTAssertEqual(actualCommand, command)
-    }
-
-    func testRunWithCommandPathCriticalVerboseDefined() throws {
-        let config = genRunConfig([.command(echo), .path(path), .critical(critical), .verbose(verbose)])
-        let command = Command(run: Run(command: echo, path: path, critical: critical, verbose: verbose))
-        let actualCommand = try YAMLDecoder().decode(Command.self, from: config)
-        XCTAssertEqual(actualCommand, command)
     }
 
     func testInvalidCommandInHook() throws {
@@ -222,17 +132,5 @@ final class ShuskyModelsTests: XCTestCase {
         let yml = try Yams.load(yaml: config)
         guard let data = yml as? [String: Any] else { return XCTFail(" Is not a dict ") }
         XCTAssertEqual(try Hook.parse(hookType: .preCommit, data), expectedHook)
-    }
-
-    /// Returns path to the built products directory.
-    var productsDirectory: URL {
-        #if os(macOS)
-            for bundle in Bundle.allBundles where bundle.bundlePath.hasSuffix(".xctest") {
-                return bundle.bundleURL.deletingLastPathComponent()
-            }
-            fatalError("couldn't find the products directory")
-        #else
-            return Bundle.main.bundleURL
-        #endif
     }
 }

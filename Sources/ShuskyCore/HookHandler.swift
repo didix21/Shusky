@@ -11,7 +11,7 @@ protocol Printable {
     func print(_ str: Any, terminator: String)
 }
 
-class Printer: Printable {
+final class Printer: Printable {
     func print(_ str: Any) {
         Swift.print(str)
     }
@@ -58,33 +58,19 @@ final class HookHandler {
         return 0
     }
 
-    private func isVerbose(command: Command) -> Bool {
-        guard let runVerbose = command.run.verbose else {
-            return hook.verbose
-        }
-
-        return runVerbose
-    }
-
-    private func isCritical(command: Command) -> Bool {
-        guard let critical = command.run.critical else {
-            return true
-        }
-
-        return critical
-    }
-
     private func getResult(command: Command) -> CommandState {
-        var result: ShellResult
+        let commandResolver = CommandResolver(globalVerbose: hook.verbose, runOptions: command.run)
+        let conf = commandResolver.evaluateConfiguration()
+        let result: ShellResult
 
-        if isVerbose(command: command) {
+        if conf.verbose {
             result = runVerbose(command)
         } else {
             result = runLaconic(command)
         }
 
         guard result.status == 0 else {
-            if !isVerbose(command: command) {
+            if !conf.verbose {
                 printer.print(result.output)
                 if let stdout = getStdOut() {
                     printer.print(stdout)
@@ -93,7 +79,7 @@ final class HookHandler {
                     printer.print(stderr)
                 }
             }
-            if !isCritical(command: command) {
+            if !conf.critical {
                 return .isNotCritical(command, errorCode: result.status)
             }
             return .error(command, errorCode: result.status)
