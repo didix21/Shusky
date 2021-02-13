@@ -7,8 +7,8 @@ import Foundation
 import XCTest
 
 final class ShellTests: XCTestCase {
-    let printSomething = "print something"
-    lazy var echo = "echo \(printSomething)"
+    private let printSomething = "print something"
+    private lazy var echo = "echo \(printSomething)"
 
     func testShellExecute() {
         let shell = Shell()

@@ -7,6 +7,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/nicklockwood/SwiftFormat", from: "0.47.2"),
         .package(url: "https://github.com/realm/SwiftLint.git", from: "0.40.3"),
+        .package(url: "https://github.com/peripheryapp/periphery", from: "2.0.0"),
     ],
     targets: [.target(name: "BuildTools", path: "")]
 )

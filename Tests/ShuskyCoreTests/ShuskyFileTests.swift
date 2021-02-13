@@ -4,27 +4,27 @@ import Foundation
 import XCTest
 
 final class ShuskyFileTests: XCTestCase {
-    let fileName = ".shusky.yml"
-    let tmpFolder = Folder.temporary
-    var testFolder: Folder!
-    var shuskyFile: ShuskyFile!
+    private let fileName = ".shusky.yml"
+    private let tmpFolder = Folder.temporary
+    private var testFolder: Folder!
+    private var shuskyFile: ShuskyFile!
 
-    override func setUp() {
+    override func setUpWithError() throws {
         shuskyFile = ShuskyFile()
         // Setup a temp test folder that can be used as a sandbox
-        testFolder = try! tmpFolder.createSubfolderIfNeeded(
+        testFolder = try tmpFolder.createSubfolderIfNeeded(
             withName: "ShuskyConfigFilesPath"
         )
         // Empty the test folder to ensure a clean state
-        try! testFolder.empty(includingHidden: true)
+        try testFolder.empty(includingHidden: true)
 
         // Make the temp folder the current working folder
         let fileManager = FileManager.default
         fileManager.changeCurrentDirectoryPath(testFolder.path)
     }
 
-    override func tearDown() {
-        try! testFolder.empty(includingHidden: true)
+    override func tearDownWithError() throws {
+        try testFolder.empty(includingHidden: true)
     }
 
     func testShuskyFileName() throws {

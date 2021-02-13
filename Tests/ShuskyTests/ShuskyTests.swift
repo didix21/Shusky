@@ -4,12 +4,11 @@ import ShuskyCore
 import XCTest
 
 final class ShuskyTests: XCTestCase {
-    let packagePath = "Complex/Path/To/Execute/Swift/Package"
-    let binary = "shusky"
-    let gitPath = ".git/hooks/"
-    let tmpFolder = Folder.temporary
-    let shuskyFileName = ".shusky.yml"
-    var testFolder: Folder!
+    private let packagePath = "Complex/Path/To/Execute/Swift/Package"
+    private let binary = "shusky"
+    private let gitPath = ".git/hooks/"
+    private let tmpFolder = Folder.temporary
+    private var testFolder: Folder!
 
     private func swiftRun(hookType: String) -> String {
         """

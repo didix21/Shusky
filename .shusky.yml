@@ -12,5 +12,6 @@ pre-commit:
         critical: true
     - run:
         command: swift test --generate-linuxmain
-        verbose: false  
+        verbose: false
+    - swift run -c release --package-path BuildTools periphery scan  
     - git add -A

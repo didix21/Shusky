@@ -1,0 +1,24 @@
+# Configuration
+build_arguments: []
+clean_build: false
+disable_update_check: false
+format: xcode
+index_exclude: []
+index_store_path: null
+project: null
+quiet: false
+report_exclude: []
+retain_assign_only_properties: false
+retain_objc_accessible: false
+retain_public: true
+retain_unused_protocol_func_params: false
+schemes: []
+skip_build: false
+strict: true
+targets:
+- Shusky
+- ShuskyCore
+- ShuskyCoreTests
+- ShuskyTests
+verbose: false
+workspace: null

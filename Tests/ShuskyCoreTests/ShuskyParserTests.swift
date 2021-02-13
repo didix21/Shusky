@@ -8,23 +8,13 @@ import XCTest
 import Yams
 
 final class ShuskyParserTests: XCTestCase {
-    let preCommit = "pre-commit:"
-    let echo = "echo \"print with bash\""
-    let path = "./This/path"
-    var critical = true
-    var verbose = true
+    private let echo = "echo \"print with bash\""
+    private let path = "./This/path"
+    private var critical = true
+    private var verbose = true
 
-    func getYamlContent(_ config: String) -> Any {
-        guard let yaml = try? Yams.load(yaml: config) else { fatalError() }
-        return yaml
-    }
-
-    func genHookConfig(_ config: [HookConfigTests]) -> String {
+    private func genHookConfig(_ config: [HookConfigTests]) -> String {
         HookConfigTests.mapToStr(config)
-    }
-
-    func genRunConfig(_ config: [RunConfigTests]) -> String {
-        RunConfigTests.mapToStr(config)
     }
 
     func testEmptyYaml() throws {

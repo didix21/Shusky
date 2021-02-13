@@ -21,10 +21,10 @@ struct CommandResolver {
     }
 
     private func isVerbose() -> Bool {
-        return runOptions.verbose ?? globalVerbose
+        runOptions.verbose ?? globalVerbose
     }
 
     private func isCritical() -> Bool {
-        return runOptions.critical ?? true
+        runOptions.critical ?? true
     }
 }

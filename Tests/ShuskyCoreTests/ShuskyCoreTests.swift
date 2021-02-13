@@ -12,24 +12,24 @@ final class ShuskyCoreTests: XCTestCase {
     let tmpFolder = Folder.temporary
     var testFolder: Folder!
 
-    override func setUp() {
+    override func setUpWithError() throws {
         // Setup a temp test folder that can be used as a sandbox
-        testFolder = try! tmpFolder.createSubfolderIfNeeded(
+        testFolder = try tmpFolder.createSubfolderIfNeeded(
             withName: "ShuskyCorePath"
         )
         // Empty the test folder to ensure a clean state
-        try! testFolder.empty(includingHidden: true)
+        try testFolder.empty(includingHidden: true)
 
-        try! testFolder.createSubfolderIfNeeded(withName: ".git")
-        try! testFolder.createSubfolderIfNeeded(withName: gitPath)
+        try testFolder.createSubfolderIfNeeded(withName: ".git")
+        try testFolder.createSubfolderIfNeeded(withName: gitPath)
 
         // Make the temp folder the current working folder
         let fileManager = FileManager.default
         fileManager.changeCurrentDirectoryPath(testFolder.path)
     }
 
-    override func tearDown() {
-        try! testFolder.empty(includingHidden: true)
+    override func tearDownWithError() throws {
+        try testFolder.empty(includingHidden: true)
     }
 
     func testDefaultContentOfShuskyYMlAndPreCommitConfigured() throws {

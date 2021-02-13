@@ -12,10 +12,10 @@ SWIFT_PACKAGE_RESOLVED = './BuildTools/Package.resolved'
 BINARIES_PATH= './BuildTools/.build/release/'
 
 def run_binary(command: str):
-    os.system(BINARIES_PATH + command)
+    return os.system(BINARIES_PATH + command)
 
 def swift_run(command: str):
-    os.system(f'swift run -c release --package-path BuildTools {command}')
+    return os.system(f'swift run -c release --package-path BuildTools {command}')
 
 def get_json_content(file_name: str) -> dict:
     content: dict = {}
@@ -54,28 +54,24 @@ def handle_ciecle_ci_package_resolved(file_name: str, command: str, commit: str)
                 if old_commit == commit:
                     if os.path.exists(BINARIES_PATH + command_name):
                         print("Commit has not changed, execute the binary")
-                        run_binary(command)
-                        return
+                        return run_binary(command)
 
                     print("Binary not found, execute swift run")
-                    swift_run(command)
-                    return
+                    return swift_run(command)
 
                 print("Commit has changed, execute swift run")
                 pins[command_name] = commit
                 create_json(file_name, pins)
-                swift_run(command)
-                return
+                return swift_run(command)
 
         print(f"Command not found in {CI_PACKAGE_RESOLVED}, execute swift run")
         pins.update({command_name: commit})
         create_json(file_name, pins)
-        swift_run(command)
-        return
+        return swift_run(command)
 
     print(f"File {CI_PACKAGE_RESOLVED} does not exist, execute swift run")
     create_json(file_name, {command_name: commit})
-    swift_run(command)
+    return swift_run(command)
 
 
 def get_command() -> str:
@@ -102,7 +98,10 @@ def main():
 
             if package_resolved:
                 commit = get_commit_command_from_package_resolved(command_name, package_resolved)
-                handle_ciecle_ci_package_resolved(CI_PACKAGE_RESOLVED, command, commit)
+                result = handle_ciecle_ci_package_resolved(CI_PACKAGE_RESOLVED, command, commit)
+                if result != 0:
+                    print("error with exit", result)
+                    raise RuntimeError()
 
         except:
             print("Unexpected error:", sys.exc_info()[0])
