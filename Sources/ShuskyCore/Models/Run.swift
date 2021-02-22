@@ -13,25 +13,11 @@ public struct Run: Equatable, Decodable {
     public var critical: Bool?
     public var verbose: Bool?
 
-    public enum ShuskyCodingKey: String, CaseIterable {
+    public enum ShuskyCodingKey: String {
         case command
         case path
         case critical
         case verbose
-    }
-
-    public enum RunError: Error, Equatable, CustomStringConvertible {
-        case invalidData(String)
-        case invalidTypeInRunKey(ShuskyCodingKey, String)
-
-        public var description: String {
-            switch self {
-            case let .invalidData(data):
-                return "invalid data: \(data)"
-            case let .invalidTypeInRunKey(key, content):
-                return "invalid type in \(key): \(content)"
-            }
-        }
     }
 
     public static func == (lhs: Run, rhs: Run) -> Bool {
