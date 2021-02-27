@@ -2,6 +2,7 @@
 // Created by Dídac Coll Pujals on 25/05/2020.
 //
 
+import Files
 import Foundation
 @testable import ShuskyCore
 

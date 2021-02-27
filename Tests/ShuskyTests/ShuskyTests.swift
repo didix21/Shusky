@@ -50,13 +50,13 @@ final class ShuskyTests: XCTestCase {
         String(binary["file://".endIndex...])
     }
 
-    override func setUp() {
+    override func setUpWithError() throws {
         // Setup a temp test folder that can be used as a sandbox
-        testFolder = try! tmpFolder.createSubfolderIfNeeded(
+        testFolder = try tmpFolder.createSubfolderIfNeeded(
             withName: "ShuskyEnd2End"
         )
         // Empty the test folder to ensure a clean state
-        try! testFolder.empty(includingHidden: true)
+        try testFolder.empty(includingHidden: true)
 
         // Make the temp folder the current working folder
         let fileManager = FileManager.default
@@ -64,7 +64,7 @@ final class ShuskyTests: XCTestCase {
     }
 
     func testInstallIsNotAGitRepository() throws {
-        XCTAssertEqual(runShusky(subcommand: "install").status, 4)
+        XCTAssertTrue(runShusky(subcommand: "install").status > 0)
     }
 
     func testInstall() throws {

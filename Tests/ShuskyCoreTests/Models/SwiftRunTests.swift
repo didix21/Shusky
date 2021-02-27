@@ -11,6 +11,10 @@ import XCTest
 import Yams
 
 class SwiftRunTests: XCTestCase {
+    private let buildPath = ".build-test"
+    private let configuration = ConfigurationType.release
+    private let packagePath = "BuildTools"
+
     func getSwiftRun(
         command: String,
         verbose: Bool? = nil,
@@ -37,17 +41,14 @@ class SwiftRunTests: XCTestCase {
         """
 
         let swiftRun: SwiftRun = try YAMLDecoder().decode(from: yaml)
-        let expectedSwiftRun = getSwiftRun(command: "swift run swiftformat ./")
+        let expectedSwiftRun = getSwiftRun(command: "swiftformat ./")
         XCTAssertEqual(swiftRun, expectedSwiftRun)
     }
 
     func testCustomSwiftRun() throws {
         let verbose = true
         let critical = false
-        let buildPath = ".build-test"
-        let configuration = ConfigurationType.release
         let jobs = 10
-        let packagePath = "BuildTools"
         let yaml = """
         command: "swiftformat ./"
         verbose: \(verbose)
@@ -60,7 +61,7 @@ class SwiftRunTests: XCTestCase {
 
         let swiftRun: SwiftRun = try YAMLDecoder().decode(from: yaml)
         let expectedSwiftRun = getSwiftRun(
-            command: "swift run -c release --build-path ./.build-test --package-path BuildTools --jobs 10 swiftformat ./",
+            command: "swiftformat ./",
             verbose: verbose,
             critical: critical,
             buildPath: buildPath,
@@ -70,17 +71,4 @@ class SwiftRunTests: XCTestCase {
         )
         XCTAssertEqual(swiftRun, expectedSwiftRun)
     }
-
-    func shouldRunBinary() throws {
-        let yaml = """
-        command: "swiftformat ./"
-        """
-
-        let swiftRun: SwiftRun = try YAMLDecoder().decode(from: yaml)
-        let expectedSwiftRun = getSwiftRun(command: "./.build/debug/swiftformat ./")
-
-        XCTAssertEqual(swiftRun, expectedSwiftRun)
-    }
-
-    func testShouldRunBinaryWithPackagePath() throws {}
 }

@@ -1,6 +1,23 @@
 import Files
 import Foundation
 
+public extension FileManager {
+    func pathExists(at path: String, kind: LocationKind) -> Bool {
+        var isFolder: ObjCBool = false
+
+        guard fileExists(atPath: path, isDirectory: &isFolder) else {
+            return false
+        }
+
+        switch kind {
+        case .file:
+            return !isFolder.boolValue
+        case .folder:
+            return isFolder.boolValue
+        }
+    }
+}
+
 public protocol Nameable {
     var fileName: String { get }
     var path: String { get set }

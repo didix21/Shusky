@@ -37,6 +37,7 @@ git hooks with Swift. Can prevent `git commit` and `git push`.
 - Configure commands as non-critical. It allow to keep going with `git` command execution.
 - Configure commands as non-verbose. (Maybe does not work for all comands).
 - Skip git hooks with `SKIP_SHUSKY`. For example:`SKIP_SHUSKY=1 git commit -m `.
+- Handle `swift run` command for you.
 
 ## Install
 
@@ -97,6 +98,14 @@ it only will add the command for running shusky. More info in [Advanced installa
         - git add -A
     pre-merge-commit:
         - swift test
+    ```
+
+- Maybe you want to run SPM binaries, but you always have to remember to run  `swift run` for compiling the binary. Don't worry, using `swift-run` option, shusky will handle it for you.
+
+    ```yaml
+    pre-commit:
+        - swift-run:
+            command: swiftformat .
     ```
 
 - You can add especial behaviour to commands using the key `run`. For example you can set non-verbose to commands. Then only wil display output result only if the command fails. For example:

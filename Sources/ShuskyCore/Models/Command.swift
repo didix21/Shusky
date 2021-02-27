@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Command: Equatable, Decodable {
+public struct Command: Equatable {
     public var run: Run
 
     public init(run: Run) {
@@ -20,6 +20,7 @@ public struct Command: Equatable, Decodable {
 
     public enum ShuskyCoddingKeys: String {
         case run
+        case swiftRun = "swift-run"
     }
 
     public enum CommandError: Error, Equatable, CustomStringConvertible {
@@ -37,6 +38,22 @@ public struct Command: Equatable, Decodable {
                 return "invalid run"
             }
         }
+    }
+}
+
+extension Command: Decodable {
+    public enum CodingKeys: String, CodingKey {
+        case run
+        case swiftRun = "swift-run"
+    }
+
+    public init(from decoder: Decoder) throws {
+        let values = try decoder.container(keyedBy: CodingKeys.self)
+        if let swiftRun = try? values.decode(SwiftRun.self, forKey: .swiftRun) {
+            run = Run(swiftRun)
+            return
+        }
+        run = try values.decode(Run.self, forKey: .run)
     }
 }
 
