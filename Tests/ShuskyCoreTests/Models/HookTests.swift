@@ -109,6 +109,9 @@ class HookTests: XCTestCase {
                command: echo run example
                verbose: true
            - echo print this please
+           - swift-run:
+                command: swiftformat ./
+                package-path: BuildTools
         """
         let expectedHook = Hook(
             hookType: .preCommit,
@@ -116,6 +119,7 @@ class HookTests: XCTestCase {
             commands: [
                 Command(run: Run(command: "echo run example", verbose: true)),
                 Command(run: Run(command: "echo print this please")),
+                Command(run: Run(command: "swift run --package-path BuildTools swiftformat ./")),
             ]
         )
         let yml = try Yams.load(yaml: config)
