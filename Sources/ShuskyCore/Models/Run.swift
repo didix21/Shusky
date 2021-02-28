@@ -13,13 +13,6 @@ public struct Run: Equatable, Decodable {
     public var critical: Bool?
     public var verbose: Bool?
 
-    public enum ShuskyCodingKey: String {
-        case command
-        case path
-        case critical
-        case verbose
-    }
-
     public enum CodingKeys: String, CodingKey {
         case command
         case path

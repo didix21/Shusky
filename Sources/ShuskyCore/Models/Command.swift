@@ -18,11 +18,6 @@ public struct Command: Equatable {
         lhs.run == rhs.run
     }
 
-    public enum ShuskyCoddingKeys: String {
-        case run
-        case swiftRun = "swift-run"
-    }
-
     public enum CommandError: Error, Equatable, CustomStringConvertible {
         case invalidData(String)
         case noCommands

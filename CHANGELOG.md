@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.3.0](https://github.com/didix21/Shusky/tree/1.3.0) (2021-02-28)
+
+[Full Changelog](https://github.com/didix21/Shusky/compare/1.2.1...1.3.0)
+
+**Implemented enhancements:**
+
+- Improve SPM commands execution time running binaries [\#46](https://github.com/didix21/Shusky/issues/46)
+
+**Merged pull requests:**
+
+- Split ShuskyModels in different files [\#45](https://github.com/didix21/Shusky/pull/45) ([didix21](https://github.com/didix21))
+- Split ShuskyModels in different files [\#44](https://github.com/didix21/Shusky/pull/44) ([didix21](https://github.com/didix21))
+
+## [1.2.1](https://github.com/didix21/Shusky/tree/1.2.1) (2021-01-29)
+
+[Full Changelog](https://github.com/didix21/Shusky/compare/1.2.0...1.2.1)
+
 ## [1.2.0](https://github.com/didix21/Shusky/tree/1.2.0) (2020-11-07)
 
 [Full Changelog](https://github.com/didix21/Shusky/compare/1.1.0...1.2.0)
@@ -9,6 +26,10 @@
 - Update Shusky's dependencies and BuildTools [\#40](https://github.com/didix21/Shusky/issues/40)
 - Improve how information is printed in console [\#39](https://github.com/didix21/Shusky/issues/39)
 - \[\#39\] Improve how information is printed in console [\#41](https://github.com/didix21/Shusky/pull/41) ([didix21](https://github.com/didix21))
+
+**Fixed bugs:**
+
+- Fix minor issues [\#43](https://github.com/didix21/Shusky/pull/43) ([didix21](https://github.com/didix21))
 
 **Merged pull requests:**
 
@@ -21,6 +42,7 @@
 **Implemented enhancements:**
 
 - Add overwrite option for installing Shusky [\#36](https://github.com/didix21/Shusky/issues/36)
+- Enhance/46 improve spm commands execution time [\#47](https://github.com/didix21/Shusky/pull/47) ([didix21](https://github.com/didix21))
 - Add overwrite \#36 [\#38](https://github.com/didix21/Shusky/pull/38) ([didix21](https://github.com/didix21))
 
 **Fixed bugs:**

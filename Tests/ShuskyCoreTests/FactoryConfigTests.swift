@@ -71,7 +71,7 @@ enum RunConfigTests {
         return yaml
     }
 
-    private static func newYmlKey(_ key: Run.ShuskyCodingKey, _ value: Any) -> String {
+    private static func newYmlKey(_ key: Run.CodingKeys, _ value: Any) -> String {
         "        \(key.rawValue): \(value)\n"
     }
 }
