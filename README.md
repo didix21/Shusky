@@ -24,10 +24,9 @@
 
 Shusky is a port of [Husky](https://github.com/typicode/husky) to Swift which allow to execute
 git hooks with Swift. Can prevent `git commit` and `git push`.
-
-<a href="https://asciinema.org/a/qvlonNDKgmfYLgyslS7RzGY3C" target="_blank">
+<a href="https://asciinema.org/a/395288" target="_blank">
     <p align="center">
-        <img src="https://asciinema.org/a/qvlonNDKgmfYLgyslS7RzGY3C.svg" />
+        <img src="https://asciinema.org/a/395288.svg" />
     </p>
 </a>
 
@@ -131,8 +130,6 @@ In this example, if `swiftlint` fails will keep going with the commit:
             critical: false
         - git add -A
     ```
-
-    ![critical_false](./docs/images/critical_false.png)
 
 **NOTE:** More info in [Advanced configurations](https://github.com/didix21/Shusky/wiki/Advanded-configurations)
 
