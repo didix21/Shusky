@@ -1,0 +1,3 @@
+enhancement: ['feature/*', 'feat/*']
+bug: ['fix/*', 'bug/*']
+chore: chore/*
