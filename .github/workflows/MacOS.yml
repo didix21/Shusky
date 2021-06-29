@@ -1,0 +1,49 @@
+name: Swift
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+    build:
+      name: Build and test in MacOS
+      runs-on: macos-latest
+      steps:
+        - uses: actions/checkout@v2
+        - name: Cache package swift
+          uses: actions/cache@v2
+          with:
+            path: |
+              BuildTools/.build/x86_64-apple-macosx
+              BuildTools/.build/release
+            key: ${{ runner.os }}-spm-v1-${{ hashFiles('BuildTools/Package.resolved') }}
+        - name: Run swiftformat lint
+          run: | 
+            if [[ -f ./BuildTools/.build/release/swiftformat ]]; then
+              ./BuildTools/.build/release/swiftformat --lint .
+            else
+              swift run -c release --package-path BuildTools swiftformat --lint .
+            fi
+        - name: Run swiftlint
+          run: | 
+            if [[ -f ./BuildTools/.build/release/swiftlint ]]; then
+              ./BuildTools/.build/release/swiftlint lint --strict .
+            else
+              swift run -c release --package-path BuildTools swiftlint lint --strict .
+            fi
+        - name: Build
+          run: swift build -v
+        - name: Run tests
+          run: set -o pipefail && swift test --enable-code-coverage 2>&1 | xcpretty --color --report junit
+        - name: Publish Unit MacOS Test Results
+          uses: EnricoMi/publish-unit-test-result-action/composite@v1
+          if: always()
+          with:
+            files: build/reports/*.xml
+            check_name: Shusky MacOS Unit Tests
+        - name: Upload to codecov
+          run: |
+            xcrun llvm-cov export -format="lcov" .build/debug/ShuskyPackageTests.xctest/Contents/MacOS/ShuskyPackageTests -instr-profile .build/debug/codecov/default.profdata > info.lcov
+            bash <(curl https://codecov.io/bash)

@@ -1,6 +1,6 @@
 pre-push:
     - run:
-        command: set -o pipefail && swift test 2>&1 | xcpretty --color
+        command: set -o pipefail && swift test 2>&1 | bundle exec xcpretty --color
         critical: false
 pre-commit:
     - swift-run:
