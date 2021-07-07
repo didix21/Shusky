@@ -6,6 +6,8 @@ import Foundation
 
 public func swiftRun(hookType: String) -> String {
     """
+    #!/bin/sh
+
     if [[ -f .build/release/shusky ]]; then
         .build/release/shusky run \(hookType)
     else
@@ -20,6 +22,8 @@ public func swiftRunWithPath(
     packagePath: String = "Complex/Path/To/Execute/Swift/Package"
 ) -> String {
     """
+    #!/bin/sh
+
     if [[ -f ./\(packagePath)/.build/release/shusky ]]; then
         ./\(packagePath)/.build/release/shusky run \(hookType)
     else

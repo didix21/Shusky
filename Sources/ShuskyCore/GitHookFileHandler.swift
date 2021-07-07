@@ -16,6 +16,8 @@ class GitHookFileHandler: Writable, Readable {
     private var shuskyBinary = ".build/release/shusky"
     private lazy var gitHookRun: String = {
         """
+        #!/bin/sh
+
         if [[ -f \(self.shuskyBinary) ]]; then
             \(self.shuskyBinary) run \(self.hook.rawValue)
         else
@@ -27,6 +29,8 @@ class GitHookFileHandler: Writable, Readable {
 
     private lazy var gitHookRunWIthPackagePath: (String) -> String = { (packagePath: String) -> String in
         """
+        #!/bin/sh
+
         if [[ -f ./\(packagePath)/\(self.shuskyBinary) ]]; then
             ./\(packagePath)/\(self.shuskyBinary) run \(self.hook.rawValue)
         else
