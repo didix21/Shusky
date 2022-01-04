@@ -57,7 +57,7 @@ Then:
 - If you have your `Package.swift` file to another path, run:
 
     ``` bash
-    swift build --package-path .buildtools -c release --product shusky
+    swift build --package-path YourPath -c release --product shusky
     ./YourPath/.build/release/shusky install --package-path YourPath
     ```
 
