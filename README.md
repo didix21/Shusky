@@ -57,7 +57,8 @@ Then:
 - If you have your `Package.swift` file to another path, run:
 
     ``` bash
-    swift run -c release --package-path YourPath shusky install --package-path YourPath
+    swift build --package-path .buildtools -c release --product shusky
+    ./YourPath/.build/release/shusky install --package-path YourPath
     ```
 
 This will add a new file `.shusky.yml` in your root with the following configuration:
