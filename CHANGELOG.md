@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.3.3](https://github.com/didix21/Shusky/tree/1.3.3) (2022-01-04)
+
+[Full Changelog](https://github.com/didix21/Shusky/compare/1.3.2...1.3.3)
+
+**Merged pull requests:**
+
+- Add MacOS and Ubuntu Badge on Readme [\#63](https://github.com/didix21/Shusky/pull/63) ([didix21](https://github.com/didix21))
+
+## [1.3.2](https://github.com/didix21/Shusky/tree/1.3.2) (2022-01-04)
+
+[Full Changelog](https://github.com/didix21/Shusky/compare/1.3.1...1.3.2)
+
+**Fixed bugs:**
+
+- Swiftlint has increased the minimum version of swift-argument-parser [\#59](https://github.com/didix21/Shusky/issues/59)
+- package-path option of swift run and shusky seems to enter in conflict in Swift 5.4 [\#49](https://github.com/didix21/Shusky/issues/49)
+- GH-49: Update README.md with installation instructions [\#62](https://github.com/didix21/Shusky/pull/62) ([didix21](https://github.com/didix21))
+- GH-59: Update swift-argument-parser to 1.0.2 [\#60](https://github.com/didix21/Shusky/pull/60) ([didix21](https://github.com/didix21))
+
+**Merged pull requests:**
+
+- UT: Set default codecoverage target to 90% [\#61](https://github.com/didix21/Shusky/pull/61) ([didix21](https://github.com/didix21))
+
 ## [1.3.1](https://github.com/didix21/Shusky/tree/1.3.1) (2021-07-07)
 
 [Full Changelog](https://github.com/didix21/Shusky/compare/1.3.0...1.3.1)
@@ -62,6 +85,7 @@
 **Implemented enhancements:**
 
 - Add overwrite option for installing Shusky [\#36](https://github.com/didix21/Shusky/issues/36)
+- Add overwrite \#36 [\#38](https://github.com/didix21/Shusky/pull/38) ([didix21](https://github.com/didix21))
 
 **Fixed bugs:**
 
@@ -75,7 +99,6 @@
 **Implemented enhancements:**
 
 - Prefer run binary instead of swift run [\#33](https://github.com/didix21/Shusky/issues/33)
-- Add overwrite \#36 [\#38](https://github.com/didix21/Shusky/pull/38) ([didix21](https://github.com/didix21))
 - Prefer run shusky binary instead of swift run shusky [\#34](https://github.com/didix21/Shusky/pull/34) ([didix21](https://github.com/didix21))
 
 **Closed issues:**
