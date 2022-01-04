@@ -1,7 +1,8 @@
 # Shusky
 
 <p align="center">
-    <img src="https://travis-ci.org/didix21/Shusky.svg?branch=master" />
+    <img src="https://github.com/didix21/shusky/actions/workflows/MacOS.yml/badge.svg?branch=main" />
+    <img src="https://github.com/didix21/shusky/actions/workflows/Ubuntu.yml/badge.svg?branch=main" />
     <img src="https://img.shields.io/badge/Swift-5.1-orange.svg" />
     <a href="https://swift.org/package-manager">
         <img src="https://img.shields.io/badge/spm-compatible-brightgreen.svg?style=flat" alt="Swift Package Manager" />
