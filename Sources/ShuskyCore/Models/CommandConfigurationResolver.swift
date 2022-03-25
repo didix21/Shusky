@@ -7,9 +7,9 @@
 
 import Foundation
 
-struct CommandResolver {
+struct CommandConfigurationResolver {
     let globalVerbose: Bool
-    let runOptions: Run
+    let runOptions: RunOptions
 
     struct CommandConfiguration {
         let verbose: Bool

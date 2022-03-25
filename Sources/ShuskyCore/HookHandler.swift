@@ -44,7 +44,7 @@ final class HookHandler {
     }
 
     private func getResult(command: Command) -> CommandState {
-        let commandResolver = CommandResolver(globalVerbose: hook.verbose, runOptions: command.run)
+        let commandResolver = CommandConfigurationResolver(globalVerbose: hook.verbose, runOptions: command.run)
         let conf = commandResolver.evaluateConfiguration()
         let result: ShellResult
 
