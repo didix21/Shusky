@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  StringProtocol+IndexHelper.swift
 //  ShuskyCore
 //
 //  Created by Dídac Coll Pujals on 07/11/2020.

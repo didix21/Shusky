@@ -6,21 +6,6 @@ import Files
 import Foundation
 import Rainbow
 
-protocol Printable {
-    func print(_ str: Any)
-    func print(_ str: Any, terminator: String)
-}
-
-final class Printer: Printable {
-    func print(_ str: Any) {
-        Swift.print(str)
-    }
-
-    func print(_ str: Any, terminator: String) {
-        Swift.print(str, terminator: terminator)
-    }
-}
-
 final class HookHandler {
     let hook: Hook
     let shell: Executable
