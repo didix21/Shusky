@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Run: Equatable, Decodable {
+public struct Run: Equatable, Decodable, RunOptions {
     public var command: String
     public var path: String?
     public var critical: Bool?
@@ -41,6 +41,7 @@ extension Run: CustomStringConvertible {
 }
 
 extension Run {
+    /// Extends Run allowing to execute the command's binary or building it if doesn't exists with `swift run`.
     init(_ swiftRun: SwiftRun) {
         var binaryPath = Self.getBinaryPath(swiftRun)
         binaryPath += "/\(swiftRun.command.split(separator: " ")[0])"

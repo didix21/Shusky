@@ -10,7 +10,14 @@ public struct ShellResult: Equatable {
 }
 
 protocol Executable {
+    /// Execute a command and wait until finish in order to show the output.
+    ///     - Parameter command: the command that must be runned.
     func execute(_ command: String) -> ShellResult
+
+    /// Execute a commend and show his output progress while is running.
+    ///     - Parameter command: the command that must be runned.
+    ///     - Parameter rtOut: a callback which returns the command's output progress.
+    ///
     func executeWithRTProgress(_ command: String, rtOut: @escaping (_ progres: String) -> Void) -> ShellResult
 }
 

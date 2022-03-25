@@ -3,7 +3,7 @@
 //  ShuskyCore
 //
 //  Created by Dídac Coll
-//  
+//
 
 import Foundation
 
