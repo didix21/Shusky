@@ -27,7 +27,7 @@ class GitHookFileHandler: Writable, Readable {
         """
     }()
 
-    private lazy var gitHookRunWIthPackagePath: (String) -> String = { (packagePath: String) -> String in
+    private lazy var gitHookRunWithPackagePath: (String) -> String = { (packagePath: String) -> String in
         """
         #!/bin/sh
 
@@ -93,7 +93,7 @@ class GitHookFileHandler: Writable, Readable {
         guard let packagePath = packagePath else {
             return gitHookRun
         }
-        return gitHookRunWIthPackagePath(packagePath)
+        return gitHookRunWithPackagePath(packagePath)
     }
 
     private func setUserExecutablePermissions() throws {
