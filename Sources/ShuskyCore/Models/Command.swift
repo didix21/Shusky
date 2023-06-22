@@ -7,6 +7,9 @@
 
 import Foundation
 
+/**
+ A struct that represents a command to run.
+ */
 public struct Command: Equatable {
     public var run: Run
 

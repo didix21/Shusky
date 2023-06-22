@@ -7,6 +7,9 @@
 
 import Foundation
 
+/**
+ A struct that represents a command to run.
+ */
 public struct Run: Equatable, Decodable, RunOptions {
     public var command: String
     public var path: String?

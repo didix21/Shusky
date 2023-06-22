@@ -4,6 +4,11 @@
 
 import Foundation
 
+/**
+ A class that handles the addition and deletion of Git hooks to a file.
+ 
+ `GitHookFileHandler` conforms to the `Writable` and `Readable` protocols, which provide methods for writing and reading files, respectively.
+ */
 class GitHookFileHandler: Writable, Readable {
     private(set) var fileName: String
     var path: String
@@ -40,6 +45,15 @@ class GitHookFileHandler: Writable, Readable {
         """
     }
 
+    /**
+     Initializes a new GitHookFileHandler instance.
+     
+     - Parameters:
+        - hook: The type of hook to handle.
+        - path: The path to the file to handle.
+        - packagePath: The path to the package to use.
+        - overwrite: Whether to overwrite the file if it already exists.
+     */
     public init(hook: HookType, path: String, packagePath: String? = nil, overwrite: Bool = false) {
         self.hook = hook
         fileName = hook.rawValue
@@ -48,6 +62,11 @@ class GitHookFileHandler: Writable, Readable {
         self.overwrite = overwrite
     }
 
+    /**
+     Adds the hook to the file.
+     
+     - Throws: An error if the hook cannot be added.
+     */
     public func addHook() throws {
         if !overwrite, let content = try? read() {
             guard !content.contains(hookCommand()) else { return }
@@ -60,6 +79,11 @@ class GitHookFileHandler: Writable, Readable {
         try setUserExecutablePermissions()
     }
 
+    /**
+     Deletes the hook from the file.
+     
+     - Throws: An error if the hook cannot be deleted.
+     */
     public func deleteHook() throws {
         guard let content = try? read() else {
             return
