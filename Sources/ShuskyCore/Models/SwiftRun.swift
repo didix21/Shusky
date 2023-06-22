@@ -12,6 +12,7 @@ enum ConfigurationType: String {
     case debug
 }
 
+/// A struct that represents a command to run with `swift run`.
 struct SwiftRun: Decodable, CommandBehaviorProtocol, Equatable {
     public let command: String
     public let verbose: Bool?

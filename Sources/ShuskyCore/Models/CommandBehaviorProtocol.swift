@@ -7,7 +7,7 @@
 
 import Foundation
 
-public protocol CommandBehaviorProtocol {
+protocol CommandBehaviorProtocol {
     var command: String { get }
     var verbose: Bool? { get }
     var critical: Bool? { get }

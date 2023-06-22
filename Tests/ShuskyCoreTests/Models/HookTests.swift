@@ -39,7 +39,7 @@ class HookTests: XCTestCase {
         """
         let yml = try Yams.load(yaml: config)
         guard let data = yml as? [String: Any] else { return XCTFail(" Is not a dict ") }
-        assert(try Hook.parse(hookType: .prePush, data), throws: Hook.HookError.noHookFound)
+        assert(try Hook.parse(hookType: .prePush, data), throws: HookError.noHookFound)
     }
 
     func testHookIsEmpty() throws {
@@ -50,7 +50,7 @@ class HookTests: XCTestCase {
         """
         let yml = try Yams.load(yaml: config)
         guard let data = yml as? [String: Any] else { return XCTFail(" Is not a dict ") }
-        assert(try Hook.parse(hookType: .prePush, data), throws: Hook.HookError.hookIsEmpty(.prePush))
+        assert(try Hook.parse(hookType: .prePush, data), throws: HookError.hookIsEmpty(.prePush))
     }
 
     func testInvalidRunInHook() throws {
@@ -62,7 +62,7 @@ class HookTests: XCTestCase {
         guard let data = yml as? [String: Any] else { return XCTFail(" Is not a dict ") }
         assert(
             try Hook.parse(hookType: .prePush, data),
-            throws: Hook.HookError.invalidCommand(.prePush, .invalidRun)
+            throws: HookError.invalidCommand(.prePush, .invalidRun)
         )
     }
 
@@ -76,7 +76,7 @@ class HookTests: XCTestCase {
         guard let data = yml as? [String: Any] else { return XCTFail(" Is not a dict ") }
         assert(
             try Hook.parse(hookType: .preCommit, data),
-            throws: Hook.HookError.invalidTypeInHookKey(.verbose, "Invalid type")
+            throws: HookError.invalidTypeInHookKey(.verbose, "Invalid type")
         )
     }
 

@@ -7,13 +7,15 @@
 
 import Foundation
 
-/**
- A struct that represents a command to run.
- */
-public struct Run: Equatable, Decodable, RunOptions {
+/// A struct that represents a command to run.
+struct Run: Equatable, Decodable, RunOptions {
+    /// The command to run.
     public var command: String
+    /// The path where the command will be executed.
     public var path: String?
+    /// If the command must fail the whole process or continue.
     public var critical: Bool?
+    /// If the command must be verbose.
     public var verbose: Bool?
 
     public enum CodingKeys: String, CodingKey {
@@ -29,6 +31,12 @@ public struct Run: Equatable, Decodable, RunOptions {
             lhs.critical == rhs.critical
     }
 
+    /// Create a new instance of Run.
+    /// - Parameters:
+    ///   - command: The command to run.
+    ///   - path: The path where the command will be executed.
+    ///   - critical: If the command must fail the whole process or continue.
+    ///   - verbose: If the command must be verbose.
     init(command: String, path: String? = nil, critical: Bool? = nil, verbose: Bool? = nil) {
         self.command = command
         self.path = path

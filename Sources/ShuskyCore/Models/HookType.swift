@@ -7,7 +7,7 @@
 
 import Foundation
 
-/// All the available hooks
+/// All the available hooks from git. More info at [Git-Hooks](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks).
 public enum HookType: String, CaseIterable {
     case applypatchMsg = "applypatch-msg"
     case preApplyPatch = "pre-applypatch"

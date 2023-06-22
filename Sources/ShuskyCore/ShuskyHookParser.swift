@@ -22,7 +22,7 @@ public enum ShuskyParserError: Error, Equatable, CustomStringConvertible {
     case shuskyConfigIsEmpty
     case isNotDict
     case noHooksFound
-    case invalidHook(Hook.HookError)
+    case invalidHook(HookError)
 
     public var description: String {
         let shusky = ".shusky.yml file"
@@ -54,7 +54,7 @@ class ShuskyHookParser: Yamable {
         let data = try load(yamlContent)
         do {
             return try Hook.parse(hookType: hookType, data)
-        } catch let error as Hook.HookError {
+        } catch let error as HookError {
             throw ShuskyParserError.invalidHook(error)
         }
     }

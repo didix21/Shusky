@@ -1,7 +1,7 @@
 import Files
 import Foundation
 
-public extension FileManager {
+extension FileManager {
     func pathExists(at path: String, kind: LocationKind) -> Bool {
         var isFolder: ObjCBool = false
 
@@ -18,23 +18,23 @@ public extension FileManager {
     }
 }
 
-public protocol Nameable {
+protocol Nameable {
     var fileName: String { get }
     var path: String { get set }
 }
 
-public protocol Readable: Nameable {
+protocol Readable: Nameable {
     func read() throws -> String
 }
 
-public extension Readable {
+extension Readable {
     func read() throws -> String {
         let file = try File(path: path + fileName)
         return try file.readAsString()
     }
 }
 
-public protocol Writable: Nameable {
+protocol Writable: Nameable {
     func create() throws
     func write(_ string: String) throws
     func append(_ string: String) throws

@@ -6,10 +6,24 @@ import Foundation
 import Rainbow
 import Yams
 
+/// A class that provides core functionality for Shusky.
+///
+/// The main features are:
+/// - Parsing the Shusky YAML file and get the Git hooks.
+/// - Installing the Git hooks.
+/// - Uninstalling the Git hooks.
 public final class ShuskyCore {
     let printer = Printer()
+
+    /// Initializes a new instance of `ShuskyCore`.
     public init() {}
 
+    /// Runs a hook of the specified type.
+    /// - Parameters:
+    ///   - hookType: The type of hook to run.
+    ///   - shuskyPath: The path to the Shusky YAML file.
+    ///   - packagePath: The path to the package.
+    /// - Returns: An exit code.
     public func run(hookType: HookType, shuskyPath: String? = nil, packagePath _: String? = nil) -> Int32 {
         let shuskyFile = ShuskyFile(path: shuskyPath)
         do {
@@ -40,6 +54,14 @@ public final class ShuskyCore {
         return 1
     }
 
+    /// Installs hooks.
+    /// - Parameters:
+    ///   - gitPath: The path to the Git hooks directory.
+    ///   - shuskyPath: The path to the Shusky YAML file.
+    ///   - packagePath: The path to the package.
+    ///   - all: A Boolean value that indicates whether to install all hooks.
+    ///   - overwrite: A Boolean value that indicates whether to overwrite existing hooks.
+    /// - Returns: An exit code.
     public func install(
         gitPath: String,
         shuskyPath: String? = nil,
@@ -117,6 +139,9 @@ public final class ShuskyCore {
         return commandHandler.run()
     }
 
+    /// Uninstalls hooks.
+    /// - Parameter gitPath: The path to the Git hooks directory.
+    /// - Returns: An exit code.
     public func uninstall(gitPath: String) -> Int32 {
         for hook in HookType.allCases {
             let gitHookFileHandler = GitHookFileHandler(hook: hook, path: gitPath)

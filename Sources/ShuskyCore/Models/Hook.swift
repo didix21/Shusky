@@ -7,12 +7,20 @@
 
 import Foundation
 
-public struct Hook: Equatable {
-    public var hookType: HookType
-    public var verbose: Bool
-    public var commands: [Command]
 
-    public static func parse(hookType: HookType, _ data: [String: Any]) throws -> Hook {
+/// A struct that represents a hook to be run.
+struct Hook: Equatable {
+    private(set) var hookType: HookType
+    private(set) var verbose: Bool
+    private(set) var commands: [Command]
+
+    /// Parses the hook data and returns a `Hook` instance.
+    /// - Parameters:
+    ///   - hookType: The type of hook to parse.
+    ///   - data: The data to parse.
+    /// - Throws: A `HookError` if the hook is empty or not found, or if the verbose key has an invalid type.
+    /// - Returns: A `Hook` instance.
+    static func parse(hookType: HookType, _ data: [String: Any]) throws -> Hook {
         guard let hook = data[hookType.rawValue] as? [Any] else {
             if data[hookType.rawValue] != nil {
                 throw HookError.hookIsEmpty(hookType)
@@ -43,11 +51,11 @@ public struct Hook: Equatable {
                 }
 
                 guard let dict = command as? [String: [String: Any]] else {
-                    throw Command.CommandError.invalidRun
+                    throw CommandError.invalidRun
                 }
                 let json = try JSONSerialization.data(withJSONObject: dict)
                 commands.append(try JSONDecoder().decode(Command.self, from: json))
-            } catch let error as Command.CommandError {
+            } catch let error as CommandError {
                 throw HookError.invalidCommand(hookType, error)
             }
         }
@@ -60,28 +68,31 @@ public struct Hook: Equatable {
             lhs.verbose == rhs.verbose &&
             lhs.commands == rhs.commands
     }
+}
 
-    public enum ShuskyCodingKey: String {
-        case verbose
-    }
-
-    public enum HookError: Error, Equatable, CustomStringConvertible {
-        case noHookFound
-        case hookIsEmpty(HookType)
-        case invalidTypeInHookKey(ShuskyCodingKey, String)
-        case invalidCommand(HookType, Command.CommandError)
-
-        public var description: String {
-            switch self {
-            case .noHookFound:
-                return "no hook found"
-            case let .hookIsEmpty(hook):
-                return "hook: \(hook.rawValue) is empty"
-            case let .invalidTypeInHookKey(key, content):
-                return "invalid type in \(key.rawValue): \(content)"
-            case let .invalidCommand(hook, error):
-                return "invalid command in \(hook.rawValue): \(error)"
-            }
+/// An enum that defines errors that can occur when handling a hook.
+public enum HookError: Error, Equatable, CustomStringConvertible {
+    case noHookFound
+    case hookIsEmpty(HookType)
+    case invalidTypeInHookKey(ShuskyCodingKey, String)
+    case invalidCommand(HookType, CommandError)
+    
+    public var description: String {
+        switch self {
+        case .noHookFound:
+            return "no hook found"
+        case let .hookIsEmpty(hook):
+            return "hook: \(hook.rawValue) is empty"
+        case let .invalidTypeInHookKey(key, content):
+            return "invalid type in \(key.rawValue): \(content)"
+        case let .invalidCommand(hook, error):
+            return "invalid command in \(hook.rawValue): \(error)"
         }
     }
 }
+
+/// An enum that defines the keys used to parse a hook.
+public enum ShuskyCodingKey: String {
+    case verbose
+}
+

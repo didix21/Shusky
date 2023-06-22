@@ -29,7 +29,7 @@ enum HookConfigTests {
         return yaml
     }
 
-    private static func newYmlKey(_ key: Hook.ShuskyCodingKey, _ value: Any) -> String {
+    private static func newYmlKey(_ key: ShuskyCodingKey, _ value: Any) -> String {
         "\(key.rawValue): \(value)\n"
     }
 }
