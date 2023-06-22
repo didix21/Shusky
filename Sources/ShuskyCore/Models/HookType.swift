@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// All the available hooks
 public enum HookType: String, CaseIterable {
     case applypatchMsg = "applypatch-msg"
     case preApplyPatch = "pre-applypatch"
