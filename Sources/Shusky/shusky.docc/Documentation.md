@@ -1,4 +1,4 @@
-# ``shusky``
+# ``Shusky``
 
 Shusky is a port of [Husky](https://github.com/typicode/husky) to Swift which allow to execute
 git hooks with Swift.
