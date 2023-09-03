@@ -101,5 +101,5 @@ fabric.properties
 
 # End of https://www.gitignore.io/api/appcode
 
+# Swift Package Manager
 .swiftpm/
-
