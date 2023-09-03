@@ -18,11 +18,13 @@ extension FileManager {
     }
 }
 
+/// The Nameable protocol is used to represent objects that have a name and a path, such as files. 
 protocol Nameable {
     var fileName: String { get }
     var path: String { get set }
 }
 
+/// Protocol which allow to read a file a get the content as String.
 protocol Readable: Nameable {
     func read() throws -> String
 }
@@ -34,6 +36,7 @@ extension Readable {
     }
 }
 
+/// Writable protocol contains different methods for editing a file.
 protocol Writable: Nameable {
     func create() throws
     func write(_ string: String) throws
@@ -63,6 +66,7 @@ extension Writable {
     }
 }
 
+/// Main class helper for reading `.shusky.yml` file.
 class ShuskyFile: Readable, Writable {
     public let fileName = ".shusky.yml"
     public var path = "./"
@@ -83,6 +87,7 @@ class ShuskyFile: Readable, Writable {
         }
     }
 
+    /// Creates a default `.shusky.yml` file if needed.
     public func createDefaultShuskyYamlIfNeeded() throws {
         try create()
         guard let content = try? read() else {
